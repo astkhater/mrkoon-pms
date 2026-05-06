@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { font-family: 'Inter', 'Cairo', system-ui, sans-serif; }
+html[lang='ar'] { font-family: 'Cairo', 'Inter', system-ui, sans-serif; }
+
+/* Skeleton shimmer */
+.shimmer {
+  background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.1) 37%, rgba(0,0,0,0.05) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer { 0% { background-position: 100% 50% } 100% { background-position: 0 50% } }
+
+/* Focus ring */
+*:focus-visible { outline: 2px solid #0f4c81; outline-offset: 2px; }

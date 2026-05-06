@@ -1,0 +1,47 @@
+=== Mrkoon OKR/KPI Review Log ===
+Owner: Khater | Workspace: mrkoon-okr-build
+
+[2026-05-01] Session initialized — Watch Mode baseline established
+  - shared/hr/commission-schemes/        | mtime: 2026-04-23 06:14:01
+  - shared/commercial/bd-targets.xlsx    | mtime: 2026-04-18 08:59:58
+  Note: bonus-commission-framework-v7.xlsx (2026-04-22) is current commission file.
+  Note: bd-targets.xlsx unchanged since 2026-04-18.
+
+
+[2026-05-01] Consolidated review v1 produced — all 7 phases complete
+  Files reviewed: 28 (taskforce sources, OKR/KPI v5, bonus/commission v7+vm, appraisals, SOPs, VM/Ops, hiring/targets)
+  Locked decisions: 9 (kicker=13, baseline=104, attendance>6, GP=30M aim, VM trigger=15/day, SOP=sequential, SOP set=10, KPI Source=consolidate Option B, perf gates removed from templates)
+  Fixes applied: 4 (BD Calc threshold, EGY 104, ops-model 104, v7-vm rows 30-40)
+  Items pending batch approval: 12 (see consolidated section 9)
+  Output: mrkoon-okr-build/consolidated-review-v1-20260501.md
+
+
+[2026-05-01] Batch fixes applied + handover note produced — clean state achieved
+  Items applied: 22/27 (3 deferred to SOP session, 1 to build session, 1 partial)
+  Locked decisions extended: floor =6 (corrected from >6), Salah stays 12K, GP target=30M aim
+  Files modified (with .PRE-FIX-20260501-* backups): 13 xlsx + 2 docx
+  New artifacts: consolidated-review-v1, handover-note.md, sop-candidate-to-production-map-v1
+  Empty shells deprecated: 5 files renamed .DEPRECATED + README pointers placed
+  BD Calc relocated to shared/hr/commission-schemes/ (canonical)
+  DEC codes renamed to scheme codes in v5+v7 (e.g. DEC-41 → BD-COMM-Q-v7)
+  Output: mrkoon-okr-build/handover/handover-note.md
+  Status: Ready for SOP session and build session pickup.
+
+
+[2026-05-01] Self-audit pass + corrections after Khater flag
+  Triggered by: sop-index Department label miss (Khater caught)
+  Misses found and corrected: 5 (sop-index dept x6, SOP-004 KR ref, SOP-001 body version, KPI Source schema divergence x3 files, 4 phantom roles)
+  Pre-existing bugs surfaced (NOT introduced, NOT fixed): 2 (Ops TL weight=0.50, Tech PO weight=1.35) → flagged for CHRO session
+  Discipline gap: appending to registers without diff-checking the whole register first. Pattern locked going forward.
+  Files re-modified: sop-index-v1.xlsx, SOP-001 body, v5 (both mirrors) KPI Master role/weight, 3 downstream KPI Source full re-sync
+  Backups: .PRE-FIX-20260501-stage4.* per file
+
+
+[2026-05-02] Watch Mode trigger — CHRO session shipped v6
+  Files changed: okr-kpi-framework v5→v6, appraisal-annual v2→v3, appraisal-quarterly v2→v3, SOP Manual v1→v2 (with SOP-009/010, FIN03 absorbed in SOP-005)
+  v6 built from clean v5 baseline — lost 5 alignment fixes I applied 2026-05-01 with Khater approval
+  Re-applied load-bearing items to v6 (3 mirrors): KR linkage KPI-005/015/026/BD-01, KPI Definitions schema (added KPI-033 to KPI-036)
+  Flagged to CHRO: DEC-code rename, Department OKRs - Ops sheet, GP forecast date-stamp (policy/preference items, not load-bearing)
+  Applied queued workspace fixes: sop-index MAP-001 pointer, sop-candidate map FIN01/FIN03 status revert
+  Synced monitoring-cadence-matrix-v2 KPI Source to v6 KPI Master (byte-aligned)
+  Backups: .PRE-FIX-20260502.xlsx per file

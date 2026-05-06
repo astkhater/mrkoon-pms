@@ -1,0 +1,4 @@
+Mrkoon OKR/KPI/Appraisal Web App — Locked Technical Decisions
+==============================================================
+
+(Populated during build phases. Empty at Phase 0 start.)

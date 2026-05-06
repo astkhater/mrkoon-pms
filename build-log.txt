@@ -1,0 +1,86 @@
+Mrkoon OKR/KPI/Appraisal Web App — Build Log
+=============================================
+
+2026-05-02 — Session 1 (autonomous)
+- Read mrkoon-standards (company-context, ux-standards, build-standards) — current
+- Read handover-note v1 (2026-05-01) — full first-session read complete
+- Folder structure created
+- Phase 0 short summary presented; Khater away → instructed to do all that doesn't need approval
+- Phase 0 confirmation page produced → handover/phase-0-confirmation-v1-20260502.md
+- Pre-build docs produced (BRD, TRD, SDD, User Stories, Use Cases, Acceptance Criteria, Test Cases) → docs/
+- Design artifacts produced (wireframes, user flows, design decisions) → design/
+- Database SQL produced (schema, RLS, seed) → database/
+- Edge Functions written (CRM-sync, ERP-sync, dormant) → backend/edge-functions/
+- API spec written → backend/api-specs/
+- Frontend scaffold (Vite/React/Tailwind, contexts, routing, role gates) → frontend/
+- Base UI components produced (Button, Input, Select, Card, Badge, TrafficLight, Empty, Skeleton, RatingScale, ConfirmDialog, PayoutBreakdown) → frontend/src/components/
+- Page shells produced (Login, 7 role dashboards, OKR, KPI, Appraisal, Bonus, SOP, Admin, Audit, NotFound) → frontend/src/pages/
+- Language files (en.js, ar.js) — full coverage → frontend/src/lang/
+- QA test plan v1 → qa/test-plans/
+- Handover docs (env-vars, architecture, setup-guide, glossary, how-to-* x5) → handover-docs/
+- Session status report → handover-docs/session-status-v1-20260502.md
+- All work blocked on Khera return logged in session-status §"Blocked on Khater"
+
+2026-05-02 — Session 1 (Khater back, Q&A round 1)
+- Locked OD-03 (PIP flag-only v1, full v2)
+- Locked OD-04 (AM reactivation: dormant-3mo client re-engaged with ≥1 selling action; ≥2 events/month qualifies)
+- Locked OD-05 (AM portfolio snapshot at month close)
+- Added D-33 (levels/grades as config, decoupled from access roles, 10 levels with active/dormant flag)
+- Added D-34 (Inputs panel + Assumptions panel — two tabbed Admin sections, both audited; new config.assumptions table to add in schema v2)
+- Pending paste-ins from Khater: 10-level band data + BD rate scale 8 anchors
+- Bash workspace down — cannot read xlsx in this session
+
+2026-05-02 — Session 1 (CHRO handoff received)
+- CHRO handoff captured → handover/handoff-from-chro-v1-20260502.md
+- Read shared/CURRENT-VERSIONS.md (per memory rule)
+- v6 framework + quarterly-v3 + annual-v3 now canonical (v5/v2 archived earlier today by CHRO)
+- Locked architectural corrections D-35 to D-40:
+  D-35: annual formula uses 'goals' 10%, not 'manager' — schema col rename manager_score → goals_score
+  D-36: KPI weight_type enum (scored/monitor/gate/dashboard) replaces is_dashboard_only boolean
+  D-37: Ops TL dual rendering — 4 scored KPIs in appraisal, 5 gates separate in bonus
+  D-38: Tech PO split rendering — 6 scored + 3 monitor (TECH-PO-07/08/09)
+  D-39: VM 10 scored KPIs (VM-09 + VM-10 added in v6)
+  D-40: version reference via family name + CURRENT-VERSIONS.md
+- Schema v2 task #14 created — pending paste-ins or workspace return
+
+2026-05-02 — Session 1 (schema v2 cut, Khater confirm)
+- Schema v2 → database/schema/01-schema-v2-20260502.sql
+  - NEW config.levels (10 levels seeded; TL active; Manager/Sr Mgr/Head/Director dormant)
+  - NEW config.assumptions (D-34)
+  - def.kpis: weight_type_default enum (scored/monitor/gate/dashboard) + gate_amount/gate_threshold
+  - def.kpi_role_weights: per-row weight_type with check constraints; deferred sum-check trigger
+  - def.functional_roles.level_id FK -> config.levels
+  - track.appraisals: + goals_score, + goals_comment (D-35)
+  - calc views: only weight_type='scored' enters quarterly avg; annual = 70/20/10 KPI/comp/goals
+- RLS v2 -> database/rls-policies/02-rls-policies-v2-20260502.sql
+  - levels: admin/hr write, all read
+  - assumptions: admin/hr/finance write; dept-scoped read for managers/dept-heads/employees; clevel read
+- Seed v2 -> database/seed-data/03-seed-v2-20260502.sql
+  - 10 levels seeded with active flags per Khater
+  - functional_roles linked to level_id
+  - BD rate scale kept as placeholder (linear interpolation) - Khater fills via Compensation Inputs panel
+  - 8 commission schemes; AM-COMM-v7 reactivation rule expressed per Khater 2026-05-02
+  - 13 assumption rows seeded (BD activity expectations + AM dormancy + Ops gate cap + VM attendance + Ops on-time)
+  - 40 KPI placeholder rows; KPI-021..025 'gate' for OpsTL; KPI-026..028 'monitor' for Tech PO; KPI-033/034/036/039/040 'dashboard'
+  - All KPI*role weights blank - admin fills via KPI Master panel
+- Frontend admin panels -> frontend/src/pages/admin/
+  - LevelsPanel.jsx, CompensationInputsPanel.jsx, AssumptionsPanel.jsx, KPIMasterPanel.jsx
+  - Reusable components/admin/ConfigEditor.jsx (table edit-in-place)
+  - ConfigPage.jsx updated with cards linking to all 4 panels
+  - App.jsx routes wired with role gates
+- Task #14 closed
+- Still pending: workspace return -> parse v6 KPI Master xlsx -> seed real weights via panels
+
+2026-05-02 — Session 1 (Supabase staging deployment via Chrome)
+- Project created: mrkoon-okr-staging (ref: ngfwrylotxnsodfyvegv, region eu-west-1, Free plan)
+- API URL: https://ngfwrylotxnsodfyvegv.supabase.co
+- Schema v2 applied via SQL Editor (chunked-paste via Monaco setValue) -> 30 tables
+- RLS v2 applied -> 29 tables RLS-enabled (helpers in public schema, not auth)
+- Seed v2 applied -> 17 lookup tables populated (verified counts)
+- Data API: all 4 custom schemas exposed (config/def/track/calc) + audit
+- Two fixes applied in-flight:
+  - auth.* helper functions moved to public.app_* (Supabase reserves auth schema)
+  - audit.stamp_row replaced with defensive per-column exception blocks (some bulk inserts triggered "no field created_at" intermittently)
+- Anon key extraction blocked by safety guard (correct behavior for JWTs)
+- Deploy status doc -> handover-docs/staging-deploy-status-v1-20260502.md
+- Task #15 closed
