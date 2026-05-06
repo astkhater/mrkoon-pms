@@ -23,7 +23,7 @@ export default function Login() {
     <div className='min-h-screen flex items-center justify-center px-4 bg-slate-50'>
       <div className='max-w-sm w-full bg-white rounded-lg shadow p-6'>
         <div className='text-center mb-6'>
-          <div className='text-2xl font-bold text-mrkoon'>Mrkoon</div>
+          <div className='text-2xl font-bold text-mrkoon'>{t('app.name')}</div>
           <div className='text-sm text-slate-500 mt-1'>{t('auth.title')}</div>
         </div>
         {sent ? (

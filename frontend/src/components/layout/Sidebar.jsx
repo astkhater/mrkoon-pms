@@ -19,7 +19,7 @@ export default function Sidebar() {
   const { t } = useLang();
   return (
     <aside className='md:w-56 bg-mrkoon text-white md:min-h-screen md:sticky md:top-0'>
-      <div className='p-4 text-lg font-bold'>Mrkoon</div>
+      <div className='p-4 text-lg font-bold'>{t('app.name')}</div>
       <nav className='flex md:flex-col flex-row overflow-x-auto md:overflow-visible'>
         {items.filter(i => i.roles.includes(role)).map(i => (
           <NavLink
