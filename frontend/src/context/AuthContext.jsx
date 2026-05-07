@@ -23,11 +23,12 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!session) { setProfile(null); return; }
     (async () => {
+      // Lookup by email (def.users.id may not match auth.users.id for roster-imported employees)
       const { data, error } = await supabase
         .schema('def')
         .from('users')
         .select('id, email, full_name_en, full_name_ar, role_code, functional_role_id, department_id, manager_id, level_id')
-        .eq('id', session.user.id)
+        .eq('email', session.user.email)
         .maybeSingle();
       if (error) console.error('[auth] profile fetch error:', error);
       setProfile(data ?? null);
