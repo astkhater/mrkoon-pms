@@ -46,6 +46,8 @@ export default function App() {
     <AppShell>
       <Routes>
         <Route path='/' element={<RoleHome role={role} />} />
+        <Route path='/login' element={<Navigate to='/' replace />} />
+        <Route path='/dashboard' element={<RoleHome role={role} />} />
         <Route path='/dashboard/employee' element={<RoleGate roles={['employee','manager','dept_head','hr','finance','c_level','admin']}><EmployeeDash /></RoleGate>} />
         <Route path='/dashboard/manager' element={<RoleGate roles={['manager','dept_head','admin']}><ManagerDash /></RoleGate>} />
         <Route path='/dashboard/dept-head' element={<RoleGate roles={['dept_head','admin']}><DeptHeadDash /></RoleGate>} />
