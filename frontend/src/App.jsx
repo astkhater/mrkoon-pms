@@ -76,6 +76,8 @@ export default function App() {
 }
 
 function RoleHome({ role }) {
+  // Permissions overlay: admin > c_level > dept_head > finance > hr > manager > employee
+  const { permissions = [] } = useAuth();
   const map = {
     employee:  '/dashboard/employee',
     manager:   '/dashboard/manager',
@@ -85,5 +87,9 @@ function RoleHome({ role }) {
     c_level:   '/dashboard/clevel',
     admin:     '/dashboard/admin',
   };
+  // Prefer functional-permission home over org role_code home (admin > c_level etc.)
+  if (permissions.includes('admin')) return <Navigate to='/dashboard/admin' replace />;
+  if (permissions.includes('hr') && role !== 'c_level') return <Navigate to='/dashboard/hr' replace />;
+  if (permissions.includes('finance') && role !== 'c_level' && role !== 'dept_head') return <Navigate to='/dashboard/finance' replace />;
   return <Navigate to={map[role] || '/dashboard/employee'} replace />;
 }

@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
       const { data, error } = await supabase
         .schema('def')
         .from('users')
-        .select('id, email, full_name_en, full_name_ar, role_code, functional_role_id, department_id, manager_id, level_id')
+        .select('id, email, full_name_en, full_name_ar, role_code, functional_role_id, department_id, manager_id, level_id, permissions')
         .eq('email', session.user.email)
         .maybeSingle();
       if (error) console.error('[auth] profile fetch error:', error);
@@ -38,6 +38,16 @@ export function AuthProvider({ children }) {
   // Hold off on resolving the role until profile actually loads after a fresh session,
   // otherwise the home redirect routes to the employee fallback.
   const role = profile?.role_code ?? (session && profile === null ? '__loading__' : null);
+  const permissions = profile?.permissions ?? [];
+
+  // hasAccess('hr') returns true if role_code='hr' OR 'hr' in permissions array.
+  // Used by RoleGate and Sidebar to gate functional pages without forcing role_code
+  // to double as both org-position and access-tier.
+  function hasAccess(requiredRoles) {
+    if (!Array.isArray(requiredRoles)) requiredRoles = [requiredRoles];
+    if (requiredRoles.includes(role)) return true;
+    return requiredRoles.some(r => permissions.includes(r));
+  }
 
   async function signInWithMagicLink(email) {
     return await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
@@ -45,7 +55,7 @@ export function AuthProvider({ children }) {
   async function signOut() { await supabase.auth.signOut(); }
 
   return (
-    <AuthCtx.Provider value={{ session, profile, role, loading, signInWithMagicLink, signOut }}>
+    <AuthCtx.Provider value={{ session, profile, role, permissions, hasAccess, loading, signInWithMagicLink, signOut }}>
       {children}
     </AuthCtx.Provider>
   );
