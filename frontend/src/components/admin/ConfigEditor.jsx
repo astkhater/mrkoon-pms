@@ -28,7 +28,10 @@ export default function ConfigEditor({ schema, table, columns, filterUI, filter,
     setLoading(true);
     (async () => {
       let q = supabase.schema(schema).from(table).select('*');
-      if (filter) for (const [k, v] of Object.entries(filter)) q = q.eq(k, v);
+      if (filter) for (const [k, v] of Object.entries(filter)) {
+        // PostgREST: .eq(col, null) doesn't match NULL — use .is(col, null) instead.
+        q = (v === null || v === undefined) ? q.is(k, null) : q.eq(k, v);
+      }
       if (orderBy) q = q.order(orderBy);
       const { data, error } = await q;
       if (cancelled) return;

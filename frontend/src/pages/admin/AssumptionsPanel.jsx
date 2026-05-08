@@ -3,19 +3,18 @@ import { supabase } from '../../utils/supabase.js';
 import ConfigEditor from '../../components/admin/ConfigEditor.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
 
-// Admin → Config → Assumptions — D-34 Khater Q3
-// Operational expectations from TaskForce sheets. Drive activity dashboards, NOT payouts.
-// Tabs by department; sub-filter by functional role.
+// Admin → Config → Assumptions
+// Single source of truth for company + department + role-level assumptions.
+// Tabs: COMPANY (null department) + each department code.
 export default function AssumptionsPanel() {
   const { t } = useTranslation();
   const [departments, setDepartments] = useState([]);
-  const [activeDept, setActiveDept] = useState(null);
+  const [activeDept, setActiveDept] = useState('COMPANY');
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase.schema('def').from('departments').select('code, name_en').order('code');
       setDepartments(data || []);
-      if (data?.length) setActiveDept(data[0].code);
     })();
   }, []);
 
@@ -29,13 +28,27 @@ export default function AssumptionsPanel() {
     { key: 'notes',                label: 'Notes', type: 'text' },
   ];
 
+  // COMPANY tab → department_code IS NULL; otherwise filter by code
+  const isCompanyView = activeDept === 'COMPANY';
+  const filter = isCompanyView ? { department_code: null } : { department_code: activeDept };
+  const newRow = isCompanyView
+    ? { department_code: null, period: 'FY2026', key: 'new_assumption' }
+    : { department_code: activeDept, period: 'FY2026', key: 'new_assumption' };
+
   return (
     <div className='space-y-4'>
       <h1 className='text-2xl font-semibold'>Assumptions</h1>
       <p className='text-sm text-slate-600'>
-        Operational expectations (e.g., BD ≥13/qtr → ≥8/month → ~16–20 meetings → ~40–50 qualifying calls). These drive activity dashboards. They do not drive payouts — payout values live in <em>Compensation Inputs</em>.
+        Single source of truth for targets, ratios, and operational expectations. Calc views read these to derive KR/KPI thresholds. Edit here propagates everywhere on next read. Payout values live separately in <em>Compensation Inputs</em>.
       </p>
       <div className='flex flex-wrap gap-2 border-b pb-2'>
+        <button
+          key='COMPANY'
+          onClick={() => setActiveDept('COMPANY')}
+          className={`px-3 py-1.5 rounded text-sm ${activeDept === 'COMPANY' ? 'bg-mrkoon text-white' : 'bg-white border'}`}
+        >
+          🏢 Company-wide
+        </button>
         {departments.map((d) => (
           <button
             key={d.code}
@@ -46,17 +59,15 @@ export default function AssumptionsPanel() {
           </button>
         ))}
       </div>
-      {activeDept && (
-        <ConfigEditor
-          schema='config'
-          table='assumptions'
-          columns={columns}
-          keyCols={['id']}
-          filter={{ department_code: activeDept }}
-          orderBy='key'
-          newRow={{ department_code: activeDept, key: 'new_assumption' }}
-        />
-      )}
+      <ConfigEditor
+        schema='config'
+        table='assumptions'
+        columns={columns}
+        keyCols={['id']}
+        filter={filter}
+        orderBy='key'
+        newRow={newRow}
+      />
     </div>
   );
 }

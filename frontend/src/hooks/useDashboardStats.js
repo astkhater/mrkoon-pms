@@ -110,6 +110,27 @@ export function useRecentAudit(limit = 10) {
   });
 }
 
+// Company-wide assumptions (department_code IS NULL).
+// These are the single source of truth read by calc views and dashboards.
+export function useCompanyAssumptions() {
+  return useQuery({
+    queryKey: ['stats.assumptions.company'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .schema('config')
+        .from('assumptions')
+        .select('key, value_numeric, unit, period, notes')
+        .is('department_code', null)
+        .order('key');
+      if (error) throw error;
+      // Index by key for easy lookup: assumptions.gp_target_annual.value_numeric
+      const byKey = {};
+      (data ?? []).forEach(a => { byKey[a.key] = a; });
+      return { rows: data ?? [], byKey };
+    },
+  });
+}
+
 // Active cycle period (the open one).
 export function useActiveCycle() {
   return useQuery({

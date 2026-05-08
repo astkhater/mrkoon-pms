@@ -153,8 +153,9 @@ export default function AdminDash() {
 
       {/* Quick links */}
       <Card title={lang === 'ar' ? 'إجراءات سريعة' : 'Quick actions'}>
-        <div className='grid sm:grid-cols-3 md:grid-cols-5 gap-2 text-sm'>
+        <div className='grid sm:grid-cols-3 md:grid-cols-6 gap-2 text-sm'>
           <Link to='/admin/config' className='border rounded p-2 hover:bg-slate-50'>{t('admin.config')}</Link>
+          <Link to='/admin/assumptions' className='border rounded p-2 hover:bg-slate-50 bg-amber-50'>📊 Assumptions</Link>
           <Link to='/admin/kpi-master' className='border rounded p-2 hover:bg-slate-50'>{t('admin.kpis')}</Link>
           <Link to='/admin/levels' className='border rounded p-2 hover:bg-slate-50'>{t('admin.salary_bands')}</Link>
           <Link to='/audit' className='border rounded p-2 hover:bg-slate-50'>{t('nav.audit')}</Link>

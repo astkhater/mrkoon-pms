@@ -8,6 +8,7 @@ import {
   useHeadcountStats,
   useKPILibraryStats,
   useActiveCycle,
+  useCompanyAssumptions,
 } from '../../hooks/useDashboardStats.js';
 
 function StatTile({ label, value, hint }) {
@@ -20,14 +21,24 @@ function StatTile({ label, value, hint }) {
   );
 }
 
+function fmtMoney(n) {
+  if (n == null) return '—';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
+  return String(n);
+}
+function fmtPct(n) { return n == null ? '—' : (n * 100).toFixed(1) + '%'; }
+
 export default function CLevelDash() {
   const { t, lang } = useTranslation();
   const { data: objectives, isLoading } = useObjectives();
   const hc = useHeadcountStats();
   const kpi = useKPILibraryStats();
   const cycles = useActiveCycle();
+  const assumptions = useCompanyAssumptions();
 
   const companyObjs = (objectives ?? []).filter(o => o.level === 'company');
+  const A = assumptions.data?.byKey ?? {};
 
   return (
     <div className='space-y-6'>
@@ -57,6 +68,24 @@ export default function CLevelDash() {
           hint={cycles.data?.[0]?.type ?? ''}
         />
       </div>
+
+      <Card title={lang === 'ar' ? 'الافتراضات على مستوى الشركة (FY 2026)' : 'Company assumptions (FY 2026 — single source of truth)'}>
+        {assumptions.isLoading ? <Skeleton count={4} className='h-3' /> : (
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-3 text-sm'>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'هدف الربح السنوي' : 'GP Target'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtMoney(A.gp_target_annual?.value_numeric)} EGP</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'توقع الربح' : 'GP Forecast'}</div><div className='text-lg font-semibold text-emerald-600'>{fmtMoney(A.gp_forecast_annual?.value_numeric)} EGP</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'هامش الربح' : 'Blended Margin'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.blended_gp_margin?.value_numeric)}</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'الاستحواذ السنوي' : 'New Clients (Year)'}</div><div className='text-lg font-semibold text-mrkoon'>{A.new_clients_year_target?.value_numeric ?? '—'}</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'GMV أسبوعي' : 'Weekly GMV'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtMoney(A.weekly_gmv_target?.value_numeric)} EGP</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'احتفاظ' : 'Retention'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.retention_rate_min?.value_numeric)}</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'الجودة' : 'Loading Quality'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.loading_zero_issue_rate?.value_numeric)}</div></div>
+            <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'وقت التشغيل' : 'Platform Uptime'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.platform_uptime_min?.value_numeric)}</div></div>
+          </div>
+        )}
+        <div className='text-xs text-slate-400 mt-3'>
+          {lang === 'ar' ? 'مصدر واحد للحقيقة — يحرر عبر' : 'Single source of truth — edit via'} <Link to='/admin/assumptions' className='text-mrkoon hover:underline'>Admin → Assumptions</Link>
+        </div>
+      </Card>
 
       <Card title={lang === 'ar' ? 'الأهداف على مستوى الشركة (FY 2026)' : 'Company objectives (FY 2026)'}>
         {isLoading ? <Skeleton count={6} className='h-12' /> : (
