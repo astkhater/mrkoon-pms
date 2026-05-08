@@ -67,7 +67,29 @@ export function useOKRProgress() {
         if ((error.message || '').includes('schema')) return [];
         throw error;
       }
-      return data ?? [];
+      const byObj = {};
+      (data ?? []).forEach(r => { byObj[r.objective_id] = r.progress; });
+      return { rows: data ?? [], byObj };
+    },
+  });
+}
+
+// Effective KR targets (formula_ref → assumption value, falling back to static).
+export function useKRTargets() {
+  return useQuery({
+    queryKey: ['calc.vw_kr_target'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .schema('calc')
+        .from('vw_kr_target')
+        .select('id, code, formula_ref, effective_target, static_target');
+      if (error) {
+        if ((error.message || '').toLowerCase().includes('schema')) return { byId: {}, rows: [] };
+        throw error;
+      }
+      const byId = {};
+      (data ?? []).forEach(r => { byId[r.id] = r; });
+      return { byId, rows: data ?? [] };
     },
   });
 }

@@ -7,6 +7,7 @@ export default {
     dashboard: 'Dashboard',
     okrs: 'OKRs',
     kpis: 'KPIs',
+    cadence: 'Cadence',
     appraisals: 'Appraisals',
     bonus: 'Bonus & Commission',
     sops: 'SOPs',

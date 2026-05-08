@@ -157,6 +157,7 @@ export default function AdminDash() {
           <Link to='/admin/config' className='border rounded p-2 hover:bg-slate-50'>{t('admin.config')}</Link>
           <Link to='/admin/assumptions' className='border rounded p-2 hover:bg-slate-50 bg-amber-50'>📊 Assumptions</Link>
           <Link to='/admin/kpi-master' className='border rounded p-2 hover:bg-slate-50'>{t('admin.kpis')}</Link>
+          <Link to='/admin/users' className='border rounded p-2 hover:bg-slate-50'>👤 {t('admin.users')}</Link>
           <Link to='/admin/levels' className='border rounded p-2 hover:bg-slate-50'>{t('admin.salary_bands')}</Link>
           <Link to='/audit' className='border rounded p-2 hover:bg-slate-50'>{t('nav.audit')}</Link>
           <Link to='/okrs' className='border rounded p-2 hover:bg-slate-50'>{t('nav.okrs')}</Link>

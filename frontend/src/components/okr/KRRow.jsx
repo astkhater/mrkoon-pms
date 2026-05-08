@@ -12,7 +12,7 @@ const statusTone = {
   archived: 'bg-slate-50  text-slate-400',
 };
 
-export default function KRRow({ kr, canEdit, canApprove }) {
+export default function KRRow({ kr, canEdit, canApprove, effectiveTarget, formulaRef }) {
   const { lang, t } = useTranslation();
   const { profile } = useAuth();
   const qc = useQueryClient();
@@ -77,9 +77,13 @@ export default function KRRow({ kr, canEdit, canApprove }) {
       <span className='font-mono text-xs text-slate-500 w-20'>{kr.code}</span>
       <span className='flex-1'>{title}</span>
       <span className={`text-[10px] px-1.5 py-0.5 rounded ${statusTone[kr.status] || statusTone.open}`}>{kr.status || 'open'}</span>
-      {kr.target_value != null && (
-        <span className='text-xs text-slate-500 w-28 text-end'>
-          {formatNumber(kr.target_value, lang)} {kr.unit || ''}
+      {(effectiveTarget != null || kr.target_value != null) && (
+        <span className='text-xs w-28 text-end' title={formulaRef ? `Derived from assumption: ${formulaRef}` : 'Static target'}>
+          <span className={formulaRef ? 'text-mrkoon-accent font-medium' : 'text-slate-500'}>
+            {formatNumber(effectiveTarget ?? kr.target_value, lang)}
+          </span>
+          <span className='text-slate-400'> {kr.unit || ''}</span>
+          {formulaRef && <span className='block text-[9px] text-mrkoon-accent leading-none'>↻ {formulaRef}</span>}
         </span>
       )}
       <span className='text-xs text-slate-500 w-16 text-end'>w {kr.weight ?? '—'}</span>

@@ -16,6 +16,7 @@ import AdminDash from './pages/dashboards/AdminDash.jsx';
 import OKRListPage from './pages/okr/OKRListPage.jsx';
 import KPIDashboardPage from './pages/kpi/KPIDashboardPage.jsx';
 import KPIEntryPage from './pages/kpi/KPIEntryPage.jsx';
+import CadencePage from './pages/cadence/CadencePage.jsx';
 import CycleListPage from './pages/appraisal/CycleListPage.jsx';
 import AppraisalDetailPage from './pages/appraisal/AppraisalDetailPage.jsx';
 import BonusViewPage from './pages/bonus/BonusViewPage.jsx';
@@ -25,6 +26,7 @@ import LevelsPanel from './pages/admin/LevelsPanel.jsx';
 import CompensationInputsPanel from './pages/admin/CompensationInputsPanel.jsx';
 import AssumptionsPanel from './pages/admin/AssumptionsPanel.jsx';
 import KPIMasterPanel from './pages/admin/KPIMasterPanel.jsx';
+import UsersPanel from './pages/admin/UsersPanel.jsx';
 import AuditLogPage from './pages/admin/AuditLogPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 
@@ -59,6 +61,7 @@ export default function App() {
         <Route path='/okrs/*' element={<OKRListPage />} />
         <Route path='/kpis' element={<KPIDashboardPage />} />
         <Route path='/kpis/entry' element={<KPIEntryPage />} />
+        <Route path='/cadence' element={<CadencePage />} />
         <Route path='/appraisals' element={<CycleListPage />} />
         <Route path='/appraisals/:id' element={<AppraisalDetailPage />} />
         <Route path='/bonus' element={<BonusViewPage />} />
@@ -68,6 +71,7 @@ export default function App() {
         <Route path='/admin/compensation-inputs' element={<RoleGate roles={['admin','finance']}><CompensationInputsPanel /></RoleGate>} />
         <Route path='/admin/assumptions' element={<RoleGate roles={['admin','hr','finance']}><AssumptionsPanel /></RoleGate>} />
         <Route path='/admin/kpi-master' element={<RoleGate roles={['admin','hr']}><KPIMasterPanel /></RoleGate>} />
+        <Route path='/admin/users' element={<RoleGate roles={['admin','hr']}><UsersPanel /></RoleGate>} />
         <Route path='/audit' element={<RoleGate roles={['admin','hr','finance','c_level']}><AuditLogPage /></RoleGate>} />
         <Route path='*' element={<NotFound />} />
       </Routes>

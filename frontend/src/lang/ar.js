@@ -7,6 +7,7 @@ export default {
     dashboard: 'لوحة التحكم',
     okrs: 'الأهداف',
     kpis: 'المؤشرات',
+    cadence: 'الإيقاع',
     appraisals: 'التقييمات',
     bonus: 'الحوافز والعمولات',
     sops: 'إجراءات العمل',

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import ObjectiveCard from './ObjectiveCard.jsx';
-import { useObjectives, useDepartments } from '../../hooks/useOKRs.js';
+import { useObjectives, useDepartments, useOKRProgress, useKRTargets } from '../../hooks/useOKRs.js';
 import Empty from '../ui/Empty.jsx';
 import Skeleton from '../ui/Skeleton.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
@@ -9,6 +9,8 @@ export default function OKRTree() {
   const { t } = useTranslation();
   const { data: objectives, isLoading, error } = useObjectives();
   const { data: departments } = useDepartments();
+  const { data: progress } = useOKRProgress();
+  const { data: krTargets } = useKRTargets();
   const [filter, setFilter] = useState('all'); // all | company | department | individual
 
   const filtered = useMemo(() => {
@@ -43,7 +45,15 @@ export default function OKRTree() {
       {filtered.length === 0 ? (
         <Empty reason={t('empty.no_okrs')} />
       ) : (
-        filtered.map((obj) => <ObjectiveCard key={obj.id} obj={obj} departments={departments} />)
+        filtered.map((obj) => (
+          <ObjectiveCard
+            key={obj.id}
+            obj={obj}
+            departments={departments}
+            progress={progress?.byObj?.[obj.id]}
+            krTargets={krTargets?.byId}
+          />
+        ))
       )}
     </div>
   );

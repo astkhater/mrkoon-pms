@@ -19,15 +19,19 @@ export default function Login() {
     else setSent(true);
   }
 
+  // Localized horizontal color logo (navy + green) on white card.
+  const logoSrc = lang === 'ar' ? '/brand/logo-h-ar.png' : '/brand/logo-h-en.png';
+
   return (
-    <div className='min-h-screen flex items-center justify-center px-4 bg-slate-50'>
-      <div className='max-w-sm w-full bg-white rounded-lg shadow p-6'>
-        <div className='text-center mb-6'>
-          <div className='text-2xl font-bold text-mrkoon'>{t('app.name')}</div>
-          <div className='text-sm text-slate-500 mt-1'>{t('auth.title')}</div>
+    <div className='min-h-screen flex items-center justify-center px-4 bg-mrkoon'>
+      <div className='max-w-sm w-full bg-white rounded-lg shadow-lg p-8'>
+        <div className='text-center mb-8'>
+          <img src={logoSrc} alt='Mrkoon' className='h-14 mx-auto mb-4' />
+          <div className='text-base text-slate-600 font-medium mt-2'>{t('app.subtitle')}</div>
+          <div className='text-sm text-slate-500 mt-3'>{t('auth.title')}</div>
         </div>
         {sent ? (
-          <div className='text-center text-sm text-mrkoon'>{t('auth.link_sent')}</div>
+          <div className='text-center text-sm text-mrkoon-accent font-medium'>{t('auth.link_sent')}</div>
         ) : (
           <form onSubmit={onSubmit} className='space-y-4'>
             <Input
@@ -39,13 +43,13 @@ export default function Login() {
               placeholder={t('auth.email_placeholder')}
               error={error}
             />
-            <Button type='submit' className='w-full'>{t('auth.send_link')}</Button>
+            <Button type='submit' className='w-full bg-mrkoon-accent hover:opacity-90'>{t('auth.send_link')}</Button>
             <div className='text-xs text-slate-500 text-center'>{t('auth.need_help')}</div>
           </form>
         )}
-        <div className='text-center mt-4'>
-          <button onClick={toggleLang} className='text-xs text-slate-500 underline'>
-            {lang === 'ar' ? 'EN' : 'AR'}
+        <div className='text-center mt-6 border-t pt-4'>
+          <button onClick={toggleLang} className='text-xs text-slate-500 underline hover:text-mrkoon'>
+            {lang === 'ar' ? 'English' : 'العربية'}
           </button>
         </div>
       </div>
