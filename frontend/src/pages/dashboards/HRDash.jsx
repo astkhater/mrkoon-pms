@@ -5,6 +5,7 @@ import Skeleton from '../../components/ui/Skeleton.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
 import { useHeadcountStats, useActiveCycle } from '../../hooks/useDashboardStats.js';
 import { useCyclePeriods } from '../../hooks/useOKRs.js';
+import AttentionCard from '../../components/AttentionCard.jsx';
 
 function StatTile({ label, value, hint }) {
   return (
@@ -25,6 +26,8 @@ export default function HRDash() {
   return (
     <div className='space-y-6'>
       <h1 className='text-2xl font-semibold'>{t('nav.dashboard')} — HR</h1>
+
+      <AttentionCard />
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         <StatTile

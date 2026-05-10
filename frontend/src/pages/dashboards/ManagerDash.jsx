@@ -6,6 +6,7 @@ import { useTranslation } from '../../hooks/useTranslation.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useObjectives } from '../../hooks/useOKRs.js';
 import { useActiveCycle } from '../../hooks/useDashboardStats.js';
+import AttentionCard from '../../components/AttentionCard.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
 
@@ -53,6 +54,8 @@ export default function ManagerDash() {
       <h1 className='text-2xl font-semibold'>
         {t('dashboard.welcome')}{profile ? ', ' + (lang === 'ar' ? profile.full_name_ar : profile.full_name_en) : ''}
       </h1>
+
+      <AttentionCard />
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         <StatTile

@@ -5,6 +5,7 @@ import Skeleton from '../../components/ui/Skeleton.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
 import { useHeadcountStats, useActiveCycle } from '../../hooks/useDashboardStats.js';
+import AttentionCard from '../../components/AttentionCard.jsx';
 
 function StatTile({ label, value, hint }) {
   return (
@@ -36,6 +37,8 @@ export default function FinanceDash() {
         <Badge tone='red'>{t('dashboard.crm_not_connected')}</Badge>
         <Badge tone='red'>{t('dashboard.erp_not_connected')}</Badge>
       </div>
+
+      <AttentionCard />
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         <StatTile

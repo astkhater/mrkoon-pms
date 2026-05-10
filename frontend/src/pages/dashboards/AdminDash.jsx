@@ -10,6 +10,7 @@ import {
   useRecentAudit,
   useActiveCycle,
 } from '../../hooks/useDashboardStats.js';
+import AttentionCard from '../../components/AttentionCard.jsx';
 
 function StatTile({ label, value, hint }) {
   return (
@@ -50,6 +51,8 @@ export default function AdminDash() {
           {t('admin.config')} →
         </Link>
       </div>
+
+      <AttentionCard />
 
       {/* Top KPI tiles */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>

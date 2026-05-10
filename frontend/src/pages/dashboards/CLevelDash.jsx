@@ -4,6 +4,7 @@ import Card from '../../components/ui/Card.jsx';
 import Skeleton from '../../components/ui/Skeleton.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
 import { useObjectives } from '../../hooks/useOKRs.js';
+import AttentionCard from '../../components/AttentionCard.jsx';
 import {
   useHeadcountStats,
   useKPILibraryStats,
@@ -46,6 +47,8 @@ export default function CLevelDash() {
         <h1 className='text-2xl font-semibold'>{t('nav.dashboard')} — C-Level</h1>
         <Link to='/okrs' className='text-sm text-mrkoon hover:underline'>{t('nav.okrs')} →</Link>
       </div>
+
+      <AttentionCard />
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         <StatTile

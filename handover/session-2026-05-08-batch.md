@@ -189,8 +189,66 @@ cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
 ```
 
 ### What's truly left
-1. **2 BC-tier placeholder emails** — HR provides them (Mahasen + Shahd)
+1. **2 BC-tier placeholder emails** — Mahasen + Shahd; HR enters their KPIs on their behalf via the new proxy entry feature.
 2. That's it — every architectural piece is now in place.
+
+## Fourth batch (additional autonomous work)
+
+### RLS email-lookup fix + HR proxy access ✓
+- Created `public.app_user_id()` resolver — looks up def.users.id via current session email (was broken because auth.uid() != def.users.id when users are imported via roster)
+- Updated `app_user_dept`, `app_user_functional_role`, `app_manages` to use it
+- Fixed self-lookup policies on track.kpi_actuals, track.appraisals, track.appraisal_kpi_scores, track.appraisal_competency_scores
+- Added HR write access to track.kpi_actuals (so HR can enter on behalf)
+- Added Manager write access to track.kpi_actuals (so manager can correct entries for direct reports)
+
+### HR proxy KPI entry ✓ (task #41)
+KPIEntryPage now has a "Enter on behalf of" picker visible to HR/admin/manager/dept_head:
+- HR/admin → see all active employees in dropdown
+- Manager → see direct reports only
+- Dept head → see dept members
+- Self default + "Proxy mode" badge when not self
+- All target-employee KPIs/actuals/save logic switches based on selection
+
+This addresses Mahasen + Shahd: HR opens the page, picks them, enters their KPIs.
+
+### Needs your attention widget ✓ (task #42)
+New AttentionCard at top of every dashboard. Pulls live counts of:
+- Self-assessment due (employee)
+- Appraisals awaiting your manager review (manager)
+- KRs awaiting approval (manager/dept head/admin/c_level)
+- Payouts pending (finance/admin)
+- Unread notifications (everyone)
+
+Each item links directly to the relevant page.
+
+### Files added in fourth batch
+```
+NEW:
+  database/rls-policies/03-rls-email-lookup-fix-v1-20260508.sql
+  frontend/src/hooks/usePending.js
+  frontend/src/components/AttentionCard.jsx
+
+MODIFIED:
+  frontend/src/pages/kpi/KPIEntryPage.jsx (proxy picker)
+  frontend/src/pages/dashboards/AdminDash.jsx       (AttentionCard)
+  frontend/src/pages/dashboards/CLevelDash.jsx      (AttentionCard)
+  frontend/src/pages/dashboards/EmployeeDash.jsx    (AttentionCard)
+  frontend/src/pages/dashboards/ManagerDash.jsx     (AttentionCard)
+  frontend/src/pages/dashboards/HRDash.jsx          (AttentionCard)
+  frontend/src/pages/dashboards/FinanceDash.jsx     (AttentionCard)
+  frontend/src/pages/dashboards/DeptHeadDash.jsx    (AttentionCard)
+```
+
+### To apply (two parts):
+
+**1. Run the RLS fix in Supabase SQL Editor** (Chrome dropped during my run, so this is pending):
+   `database/rls-policies/03-rls-email-lookup-fix-v1-20260508.sql`
+
+**2. Push frontend:**
+```powershell
+cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
+.\push.ps1 "HR proxy entry + attention widget + RLS email-lookup fix"
+```
 
 ---
 

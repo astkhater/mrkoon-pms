@@ -7,18 +7,47 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
 
-// Pull KPIs the logged-in user is responsible for via def.kpi_role_weights.
-// Returns rows with KPI def joined.
-function useMyAssignedKPIs(functionalRoleId) {
+// Pull KPIs assigned to a given functional_role_id.
+function useAssignedKPIs(functionalRoleId) {
   return useQuery({
     enabled: !!functionalRoleId,
-    queryKey: ['my.assignedKpis', functionalRoleId],
+    queryKey: ['assignedKpis', functionalRoleId],
     queryFn: async () => {
       const { data, error } = await supabase
         .schema('def')
         .from('kpi_role_weights')
         .select('kpi_id, weight, weight_type, kpi:kpis(id, name_en, name_ar, frequency, target_value, unit, formula_text, weight_type_default)')
         .eq('functional_role_id', functionalRoleId);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+// Roster of employees the current user can write KPIs for.
+// Filters at API level: HR/admin = all; manager = direct reports; dept_head = dept members; else = none.
+function useEmployeeRoster({ canProxy, isHR, isAdmin, isDeptHead, isManager, userId, deptId }) {
+  return useQuery({
+    enabled: canProxy && !!userId,
+    queryKey: ['kpi.roster', { canProxy, isHR, isAdmin, isDeptHead, isManager, userId, deptId }],
+    queryFn: async () => {
+      let q = supabase
+        .schema('def')
+        .from('users')
+        .select('id, full_name_en, full_name_ar, functional_role_id, department_id, role_code')
+        .eq('active', true)
+        .order('full_name_en');
+      if (!(isHR || isAdmin)) {
+        if (isDeptHead && deptId) {
+          q = q.eq('department_id', deptId);
+        } else if (isManager) {
+          q = q.eq('manager_id', userId);
+        } else {
+          // No proxy scope — return empty
+          return [];
+        }
+      }
+      const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
     },
@@ -86,9 +115,26 @@ function trafficLight(actual, target) {
 
 export default function KPIEntryPage() {
   const { t, lang } = useTranslation();
-  const { profile } = useAuth();
+  const { profile, hasAccess } = useAuth();
   const qc = useQueryClient();
-  const assigned = useMyAssignedKPIs(profile?.functional_role_id);
+  const canProxy = hasAccess(['hr','admin','manager','dept_head']);
+  const [proxyTargetId, setProxyTargetId] = useState(null);
+  const roster = useEmployeeRoster({
+    canProxy,
+    isHR: hasAccess(['hr']),
+    isAdmin: hasAccess(['admin']),
+    isDeptHead: hasAccess(['dept_head']),
+    isManager: hasAccess(['manager']),
+    userId: profile?.id,
+    deptId: profile?.department_id,
+  });
+
+  // Effective target employee — proxy target if set, else self
+  const targetEmployee = proxyTargetId ? roster.data?.find(u => u.id === proxyTargetId) : profile;
+  const targetFunctionalRoleId = targetEmployee?.functional_role_id;
+  const targetEmployeeId = targetEmployee?.id;
+
+  const assigned = useAssignedKPIs(targetFunctionalRoleId);
   const periods = useOpenPeriods();
 
   // Period selector state
@@ -101,7 +147,7 @@ export default function KPIEntryPage() {
     }
   }, [periods.data, periodId]);
 
-  const actuals = useMyActuals(profile?.id, periodId);
+  const actuals = useMyActuals(targetEmployeeId, periodId);
 
   // Per-row local edits keyed by kpi_id
   const [edits, setEdits] = useState({});
@@ -135,7 +181,7 @@ export default function KPIEntryPage() {
     const existing = actuals.data?.[kpiId];
     const payload = {
       kpi_id: kpiId,
-      employee_id: profile.id,
+      employee_id: targetEmployeeId,
       period_id: periodId,
       actual_value: Number(e.actual),
       evidence_ref: e.evidence ?? null,
@@ -153,18 +199,6 @@ export default function KPIEntryPage() {
   }
 
   if (!profile) return <Skeleton count={4} className='h-12' />;
-  if (!profile.functional_role_id) {
-    return (
-      <div className='space-y-4'>
-        <h1 className='text-2xl font-semibold'>{t('kpi.enter_actuals')}</h1>
-        <Card>
-          <div className='text-sm text-slate-500'>
-            {lang === 'ar' ? 'لم يتم تعيين دور وظيفي لحسابك بعد. تواصل مع الموارد البشرية.' : 'No functional role assigned to your account. Contact HR.'}
-          </div>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className='space-y-4'>
@@ -176,6 +210,42 @@ export default function KPIEntryPage() {
           </div>
         )}
       </div>
+
+      {/* Proxy target picker — HR/admin/manager can enter on behalf of anyone */}
+      {canProxy && (
+        <Card>
+          <div className='flex items-center gap-2 text-sm flex-wrap'>
+            <label className='text-xs text-slate-500'>{lang === 'ar' ? 'إدخال نيابة عن' : 'Enter on behalf of'}:</label>
+            <select
+              value={proxyTargetId ?? ''}
+              onChange={(e) => setProxyTargetId(e.target.value || null)}
+              className='border rounded px-2 py-1'
+            >
+              <option value=''>{lang === 'ar' ? 'نفسي' : 'Myself'}</option>
+              {(roster.data ?? []).filter(u => u.id !== profile.id).map(u => (
+                <option key={u.id} value={u.id}>
+                  {lang === 'ar' ? (u.full_name_ar || u.full_name_en) : u.full_name_en} {u.role_code === 'admin' ? '' : `· ${u.role_code}`}
+                </option>
+              ))}
+            </select>
+            {proxyTargetId && (
+              <span className='text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700'>
+                {lang === 'ar' ? 'وضع الإدخال نيابة' : 'Proxy mode'}
+              </span>
+            )}
+          </div>
+        </Card>
+      )}
+
+      {!targetFunctionalRoleId && (
+        <Card>
+          <div className='text-sm text-slate-500'>
+            {proxyTargetId
+              ? (lang === 'ar' ? 'هذا الموظف ليس له دور وظيفي محدد، فلا يوجد مؤشرات معينة.' : 'This employee has no functional role assigned — no KPIs to enter.')
+              : (lang === 'ar' ? 'لم يتم تعيين دور وظيفي لحسابك. اطلب من الموارد البشرية إدخال البيانات نيابة عنك أو تعيين دور.' : 'No functional role assigned. Ask HR to enter on your behalf or assign a role.')}
+          </div>
+        </Card>
+      )}
 
       {/* Period selector */}
       <div className='flex flex-wrap gap-2 border-b pb-2'>

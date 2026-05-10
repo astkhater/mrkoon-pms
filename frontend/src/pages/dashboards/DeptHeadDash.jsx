@@ -6,6 +6,7 @@ import { useTranslation } from '../../hooks/useTranslation.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useObjectives, useDepartments } from '../../hooks/useOKRs.js';
 import { useActiveCycle } from '../../hooks/useDashboardStats.js';
+import AttentionCard from '../../components/AttentionCard.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
 
@@ -55,6 +56,8 @@ export default function DeptHeadDash() {
       <h1 className='text-2xl font-semibold'>
         {t('nav.dashboard')} — {lang === 'ar' ? (myDept?.name_ar || 'رئيس قسم') : (myDept?.name_en || 'Department Head')}
       </h1>
+
+      <AttentionCard />
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         <StatTile
