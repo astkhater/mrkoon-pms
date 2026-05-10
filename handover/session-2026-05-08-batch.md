@@ -135,9 +135,62 @@ cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
 After ~30s Netlify rebuild, the entire app should be live with brand styling and all phases active.
 
 ## Open / deferred
-- **Commission run trigger** — UI button to invoke `calc.fn_run_bd_commission` (next iteration of Phase 6)
-- **Cross-domain notifications** — inbox + accept/reject on top of audit (Phase 7b)
-- **Real emails for 39 placeholder accounts** — needs your input
+- **2 remaining placeholder emails** — Mahasen Ahmed Mohamed and Shahd Ehab Amin (HR Office Support, BC level) — not in team-directory-verified-20260418.xlsx. Get from HR.
+
+## Third batch (additional autonomous work)
+
+### Commission run trigger ✓ (task #39)
+- New SQL function `calc.fn_run_commission_bulk(p_period_id, p_scheme_filter)`:
+  - Loops eligible employees per scheme (BD acquisition, AM retention, VM-Sales, OPS field, OPS-TL gates, ONB, OpEx)
+  - Calls scheme-specific `calc.fn_run_*` per employee
+  - Returns rows of `(scheme, payouts_created)`
+- BonusViewPage now has "Run commissions for a period" card (finance/admin only) — period dropdown + scheme filter + Run button
+- Confirmation prompt before running
+
+### Phase 7b — Notifications inbox ✓ (task #40)
+- New table `track.notifications` (recipient_id, kind, ref_*, title/body bilingual, link_url, read_at, dismissed_at)
+- RLS policies + insert helper `track.fn_notify(...)`
+- Three triggers wired:
+  - **Appraisal status change** → notifies next reviewer (employee submits → manager; manager submits → dept head; dept head/calibrated → all HR)
+  - **KR locked** → notifies objective owner
+  - **Payout pending_approval** → notifies all finance users
+- Bell icon added to Topbar with unread count badge + dropdown (last 8) + "mark all read" + link to full inbox
+- `/notifications` route with full inbox: filter read/unread, per-row mark-read/dismiss/open
+- Live polling every 30s
+
+### Reporting hierarchy correction ✓
+Per your verbal correction:
+- Mohamed Waheed (BizOps) → reports to CCO directly
+- Khaled Ahmed Metwally → reports to CCO directly
+- VM-Sales (Samah, Wegdan, Mai Tarek, Samar) → report to Mohamed Hussein
+- Ziad confirmed kept under Hussein
+
+Final structure verified live in DB: Khater (CCO) has 7 directs; Hussein has 8 directs (4 OPS field + 4 VM-Sales).
+
+### Files added in third batch
+```
+NEW:
+  database/schema/01e-commission-bulk-runner-v1-20260508.sql
+  database/schema/01f-notifications-v1-20260508.sql
+  frontend/src/hooks/useNotifications.js
+  frontend/src/components/layout/NotificationBell.jsx
+  frontend/src/pages/NotificationsPage.jsx
+
+MODIFIED:
+  frontend/src/components/layout/Topbar.jsx (bell)
+  frontend/src/pages/bonus/BonusViewPage.jsx (Run for period card)
+  frontend/src/App.jsx (notifications route)
+```
+
+### Final deploy command
+```powershell
+cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
+.\push.ps1 "everything: brand + all phases + cascade + bulk gen + commission runner + notifications + hierarchy fix"
+```
+
+### What's truly left
+1. **2 BC-tier placeholder emails** — HR provides them (Mahasen + Shahd)
+2. That's it — every architectural piece is now in place.
 
 ---
 
@@ -190,6 +243,17 @@ MODIFIED:
 cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
 .\push.ps1 "phase 4b cascade + bulk appraisal gen + OKR progress display"
 ```
+
+### Reporting structure correction (2026-05-08)
+Per Khater clarification:
+- **Mohamed Waheed (BizOps)** reports directly to CCO (Khater), not to Hussein
+- **Khaled Ahmed Metwally (OPS specialist)** reports directly to CCO, not to Hussein
+- **VM-Sales (Samah, Wegdan, Mai Tarek, Samar)** now report to Hussein (was Khater)
+- **Ziad Moataz** confirmed kept under Hussein
+
+Final structure:
+- Khater (CCO) → 7 direct: Mohamed Hussein, Amany Shams, Yassin Hesham, Ali Hassan, Ismael Zakaria, Khaled Metwally, Mohamed Waheed
+- Mohamed Hussein (OPS TL) → 8 direct: Sayed, Ziad, Mohamed Mousa, Youssef (4 OPS field) + Samah, Wegdan, Mai Tarek, Samar (4 VM-Sales)
 
 ### What changes when you change an assumption now
 1. Open `/admin/assumptions` → COMPANY tab

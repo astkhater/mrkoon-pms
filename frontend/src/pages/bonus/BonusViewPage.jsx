@@ -24,6 +24,22 @@ function useSchemes() {
   });
 }
 
+function useOpenPeriods() {
+  return useQuery({
+    queryKey: ['config.cycle_periods.open'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .schema('config')
+        .from('cycle_periods')
+        .select('id, type, label, start_date, end_date, status')
+        .eq('status', 'open')
+        .order('start_date', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
 function usePayouts(filter) {
   return useQuery({
     queryKey: ['track.commission_payouts', filter],
@@ -63,7 +79,11 @@ export default function BonusViewPage() {
   const [view, setView] = useState(hasAccess(['finance','admin','c_level']) ? 'pending' : 'mine');
   const schemes = useSchemes();
   const payouts = usePayouts(view);
+  const periods = useOpenPeriods();
   const isFinance = hasAccess(['finance','admin']);
+  const [runPeriodId, setRunPeriodId] = useState('');
+  const [runScheme, setRunScheme] = useState('');
+  const [running, setRunning] = useState(false);
 
   async function approve(id) {
     const { error } = await supabase.schema('track').from('commission_payouts').update({
@@ -92,6 +112,53 @@ export default function BonusViewPage() {
         <h1 className='text-2xl font-semibold'>{t('bonus.title')}</h1>
         {isFinance && <Badge tone='amber'>{t('bonus.finance_only')}</Badge>}
       </div>
+
+      {isFinance && (
+        <Card title={lang === 'ar' ? 'تشغيل العمولات لفترة' : 'Run commissions for a period'}>
+          <div className='flex flex-wrap gap-2 items-end text-sm'>
+            <div>
+              <label className='block text-xs text-slate-500'>{t('common.period')}</label>
+              <select value={runPeriodId} onChange={e => setRunPeriodId(e.target.value)} className='border rounded px-2 py-1'>
+                <option value=''>—</option>
+                {(periods.data ?? []).map(p => <option key={p.id} value={p.id}>{p.label} · {p.type}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className='block text-xs text-slate-500'>{lang === 'ar' ? 'المخطط' : 'Scheme'}</label>
+              <select value={runScheme} onChange={e => setRunScheme(e.target.value)} className='border rounded px-2 py-1'>
+                <option value=''>{lang === 'ar' ? 'الكل' : 'All'}</option>
+                <option value='BD'>BD</option>
+                <option value='AM'>AM</option>
+                <option value='VM'>VM</option>
+                <option value='OPS'>OPS field</option>
+                <option value='OPS-TL'>OPS TL gates</option>
+                <option value='ONB'>Onboarding</option>
+                <option value='OPEX'>OpEx (MKT/TECH/FIN/HR)</option>
+              </select>
+            </div>
+            <button
+              disabled={!runPeriodId || running}
+              onClick={async () => {
+                if (!confirm(`Run commissions for the selected period${runScheme ? ' · ' + runScheme : ' (all schemes)'}? This generates draft payouts.`)) return;
+                setRunning(true);
+                const { data, error } = await supabase.schema('calc').rpc('fn_run_commission_bulk', {
+                  p_period_id: runPeriodId,
+                  p_scheme_filter: runScheme || null,
+                });
+                setRunning(false);
+                if (error) { alert('Run error: ' + error.message); return; }
+                const summary = (data ?? []).map(r => `${r.scheme}: ${r.payouts_created}`).join(' · ') || 'no rows';
+                alert('Done. ' + summary);
+                qc.invalidateQueries({ queryKey: ['track.commission_payouts'] });
+              }}
+              className='text-sm bg-mrkoon-accent text-white px-3 py-1.5 rounded disabled:opacity-50'
+            >
+              {running ? '…' : (lang === 'ar' ? 'تشغيل' : 'Run')}
+            </button>
+            <span className='text-xs text-slate-400 ms-2'>{lang === 'ar' ? 'يُنشئ مسودات للعمولات لكل موظف مؤهل' : 'Creates draft payouts per eligible employee'}</span>
+          </div>
+        </Card>
+      )}
 
       <Card title={lang === 'ar' ? 'مخططات العمولة النشطة' : 'Active commission schemes'}>
         {schemes.isLoading ? <Skeleton count={3} className='h-8' /> : (

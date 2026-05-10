@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useLang } from '../../context/LangContext.jsx';
+import NotificationBell from './NotificationBell.jsx';
 
 export default function Topbar() {
   const { profile, signOut, role, permissions = [] } = useAuth();
@@ -19,6 +20,7 @@ export default function Topbar() {
         >
           {lang === 'ar' ? 'EN' : 'AR'}
         </button>
+        <NotificationBell />
         <div className='flex items-center gap-2 border-s ps-3'>
           <div className='w-8 h-8 rounded-full bg-mrkoon-accent text-white grid place-items-center text-xs font-semibold'>{initials}</div>
           <div className='hidden md:block'>

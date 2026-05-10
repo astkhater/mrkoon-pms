@@ -17,6 +17,7 @@ import OKRListPage from './pages/okr/OKRListPage.jsx';
 import KPIDashboardPage from './pages/kpi/KPIDashboardPage.jsx';
 import KPIEntryPage from './pages/kpi/KPIEntryPage.jsx';
 import CadencePage from './pages/cadence/CadencePage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import CycleListPage from './pages/appraisal/CycleListPage.jsx';
 import AppraisalDetailPage from './pages/appraisal/AppraisalDetailPage.jsx';
 import BonusViewPage from './pages/bonus/BonusViewPage.jsx';
@@ -62,6 +63,7 @@ export default function App() {
         <Route path='/kpis' element={<KPIDashboardPage />} />
         <Route path='/kpis/entry' element={<KPIEntryPage />} />
         <Route path='/cadence' element={<CadencePage />} />
+        <Route path='/notifications' element={<NotificationsPage />} />
         <Route path='/appraisals' element={<CycleListPage />} />
         <Route path='/appraisals/:id' element={<AppraisalDetailPage />} />
         <Route path='/bonus' element={<BonusViewPage />} />
