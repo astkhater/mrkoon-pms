@@ -180,7 +180,7 @@ export default {
     thresholds: 'Thresholds',
     salary_bands: 'Salary bands',
     rating_bands: 'Rating bands',
-    cycle_periods: 'Cycle periods',
+    cycle_periods: 'Cycle Periods',
     roles_depts: 'Roles & departments',
     users: 'Users',
     activate_crm: 'Activate CRM sync',

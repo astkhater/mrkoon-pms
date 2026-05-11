@@ -20,6 +20,7 @@ import CadencePage from './pages/cadence/CadencePage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import CycleListPage from './pages/appraisal/CycleListPage.jsx';
 import AppraisalDetailPage from './pages/appraisal/AppraisalDetailPage.jsx';
+import CalibrationPage from './pages/appraisal/CalibrationPage.jsx';
 import BonusViewPage from './pages/bonus/BonusViewPage.jsx';
 import SOPIndexPage from './pages/sop/SOPIndexPage.jsx';
 import AdminConfigPage from './pages/admin/ConfigPage.jsx';
@@ -28,6 +29,7 @@ import CompensationInputsPanel from './pages/admin/CompensationInputsPanel.jsx';
 import AssumptionsPanel from './pages/admin/AssumptionsPanel.jsx';
 import KPIMasterPanel from './pages/admin/KPIMasterPanel.jsx';
 import UsersPanel from './pages/admin/UsersPanel.jsx';
+import CyclePeriodsPanel from './pages/admin/CyclePeriodsPanel.jsx';
 import AuditLogPage from './pages/admin/AuditLogPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 
@@ -65,6 +67,7 @@ export default function App() {
         <Route path='/cadence' element={<CadencePage />} />
         <Route path='/notifications' element={<NotificationsPage />} />
         <Route path='/appraisals' element={<CycleListPage />} />
+        <Route path='/appraisals/calibration' element={<RoleGate roles={['dept_head','hr','admin','c_level']}><CalibrationPage /></RoleGate>} />
         <Route path='/appraisals/:id' element={<AppraisalDetailPage />} />
         <Route path='/bonus' element={<BonusViewPage />} />
         <Route path='/sops' element={<SOPIndexPage />} />
@@ -74,6 +77,7 @@ export default function App() {
         <Route path='/admin/assumptions' element={<RoleGate roles={['admin','hr','finance']}><AssumptionsPanel /></RoleGate>} />
         <Route path='/admin/kpi-master' element={<RoleGate roles={['admin','hr']}><KPIMasterPanel /></RoleGate>} />
         <Route path='/admin/users' element={<RoleGate roles={['admin','hr']}><UsersPanel /></RoleGate>} />
+        <Route path='/admin/cycle-periods' element={<RoleGate roles={['admin','hr']}><CyclePeriodsPanel /></RoleGate>} />
         <Route path='/audit' element={<RoleGate roles={['admin','hr','finance','c_level']}><AuditLogPage /></RoleGate>} />
         <Route path='*' element={<NotFound />} />
       </Routes>

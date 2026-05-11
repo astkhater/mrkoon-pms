@@ -7,6 +7,7 @@ import { useTranslation } from '../../hooks/useTranslation.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
+import { downloadCSV } from '../../utils/csv.js';
 
 function useSchemes() {
   return useQuery({
@@ -110,7 +111,24 @@ export default function BonusViewPage() {
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl font-semibold'>{t('bonus.title')}</h1>
-        {isFinance && <Badge tone='amber'>{t('bonus.finance_only')}</Badge>}
+        <div className='flex items-center gap-3'>
+          {payouts.data?.length > 0 && (
+            <button
+              onClick={() => downloadCSV(`mrkoon-payouts-${view}-${new Date().toISOString().slice(0,10)}.csv`, payouts.data, [
+                { key: 'employee', label: 'employee', value: p => p.employee?.full_name_en },
+                { key: 'scheme', label: 'scheme', value: p => p.scheme?.name_en },
+                { key: 'cadence', label: 'cadence', value: p => p.scheme?.cadence },
+                { key: 'period', label: 'period', value: p => p.period?.label },
+                { key: 'total_amount', label: 'total_amount_egp' },
+                { key: 'status', label: 'status' },
+                { key: 'approved_at', label: 'approved_at' },
+                { key: 'notes', label: 'notes' },
+              ])}
+              className='text-sm text-mrkoon hover:underline'
+            >Export CSV</button>
+          )}
+          {isFinance && <Badge tone='amber'>{t('bonus.finance_only')}</Badge>}
+        </div>
       </div>
 
       {isFinance && (

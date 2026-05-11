@@ -4,6 +4,7 @@ import Skeleton from '../../components/ui/Skeleton.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
+import { downloadCSV } from '../../utils/csv.js';
 
 function useUsers() {
   return useQuery({
@@ -71,7 +72,23 @@ export default function UsersPanel() {
     <div className='space-y-4'>
       <div className='flex items-baseline justify-between'>
         <h1 className='text-2xl font-semibold'>{t('admin.users')}</h1>
-        <div className='text-sm text-slate-500'>{filtered.length} / {users.data?.length ?? 0}</div>
+        <div className='flex items-center gap-3 text-sm'>
+          <span className='text-slate-500'>{filtered.length} / {users.data?.length ?? 0}</span>
+          <button
+            onClick={() => downloadCSV(`mrkoon-users-${new Date().toISOString().slice(0,10)}.csv`, filtered, [
+              { key: 'email', label: 'email' },
+              { key: 'name', label: 'full_name_en', value: u => u.full_name_en },
+              { key: 'name_ar', label: 'full_name_ar', value: u => u.full_name_ar },
+              { key: 'dept', label: 'department', value: u => u.department?.code },
+              { key: 'fn', label: 'functional_role', value: u => u.functional_role?.code },
+              { key: 'lv', label: 'level', value: u => u.level?.code },
+              { key: 'role', label: 'role_code', value: u => u.role_code },
+              { key: 'perms', label: 'permissions', value: u => (u.permissions || []).join('|') },
+              { key: 'active', label: 'active', value: u => (u.active ? 'true' : 'false') },
+            ])}
+            className='text-mrkoon hover:underline'
+          >{lang === 'ar' ? 'تصدير CSV' : 'Export CSV'}</button>
+        </div>
       </div>
 
       <Card>

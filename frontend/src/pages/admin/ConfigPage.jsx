@@ -4,9 +4,11 @@ import Card from '../../components/ui/Card.jsx';
 import { useTranslation } from '../../hooks/useTranslation.js';
 
 const sections = [
+  { to: '/admin/users',                 title: 'Users',              desc: 'Roster + role / permissions / active. Edit role_code, hr/finance/admin overlays.' },
+  { to: '/admin/cycle-periods',         title: 'Cycle Periods',      desc: 'Monthly / quarterly / annual periods. Create before opening an appraisal cycle.' },
   { to: '/admin/levels',                title: 'Levels & Grades',    desc: '10 levels; activate dormant ones (Manager / Sr Manager / Head / Director).' },
   { to: '/admin/compensation-inputs',   title: 'Compensation Inputs', desc: 'BD rate scale, AM/VM/Ops rates, gates, OpEx bands. Source-of-truth for payouts.' },
-  { to: '/admin/assumptions',           title: 'Assumptions',        desc: 'Operational expectations from TaskForce — drives activity dashboards, not payouts.' },
+  { to: '/admin/assumptions',           title: 'Assumptions',        desc: 'Single source of truth for targets (GP, retention, etc.). Cascades to KRs/KPIs via formula_ref.' },
   { to: '/admin/kpi-master',            title: 'KPI Master',         desc: 'KPI catalog + per-role weights (sum = 1.00 for scored). Source: framework v6.' },
 ];
 

@@ -101,11 +101,18 @@ export default function CycleListPage() {
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl font-semibold'>{t('appraisal.title')}</h1>
-        {canManageCycles && (
-          <button onClick={() => setShowAdd(s => !s)} className='text-sm bg-mrkoon-accent text-white px-3 py-1.5 rounded hover:opacity-90'>
-            + {t('hr.open_new_cycle')}
-          </button>
-        )}
+        <div className='flex gap-2 items-center'>
+          {hasAccess(['dept_head','hr','admin','c_level']) && (
+            <Link to='/appraisals/calibration' className='text-sm border px-3 py-1.5 rounded hover:bg-slate-50'>
+              {t('appraisal.calibration')} →
+            </Link>
+          )}
+          {canManageCycles && (
+            <button onClick={() => setShowAdd(s => !s)} className='text-sm bg-mrkoon-accent text-white px-3 py-1.5 rounded hover:opacity-90'>
+              + {t('hr.open_new_cycle')}
+            </button>
+          )}
+        </div>
       </div>
 
       {showAdd && (

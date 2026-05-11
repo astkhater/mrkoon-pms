@@ -6,6 +6,7 @@ import { useTranslation } from '../../hooks/useTranslation.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
+import { downloadCSV } from '../../utils/csv.js';
 
 function useMyKPIs(functionalRoleId) {
   return useQuery({
@@ -53,9 +54,19 @@ export default function KPIDashboardPage() {
     <div className='space-y-4'>
       <div className='flex items-baseline justify-between'>
         <h1 className='text-2xl font-semibold'>{t('kpi.title')}</h1>
-        <Link to='/kpis/entry' className='text-sm bg-mrkoon text-white px-3 py-1.5 rounded hover:bg-mrkoon-dark'>
-          {t('kpi.enter_actuals')} →
-        </Link>
+        <div className='flex items-center gap-3'>
+          {rows.length > 0 && (
+            <button
+              onClick={() => downloadCSV(`mrkoon-kpis-${view}-${new Date().toISOString().slice(0,10)}.csv`, rows.filter(Boolean), [
+                'id', 'name_en', 'name_ar', 'frequency', 'target_value', 'unit', 'weight_type_default', 'formula_text', 'weight'
+              ])}
+              className='text-sm text-mrkoon hover:underline'
+            >Export CSV</button>
+          )}
+          <Link to='/kpis/entry' className='text-sm bg-mrkoon text-white px-3 py-1.5 rounded hover:bg-mrkoon-dark'>
+            {t('kpi.enter_actuals')} →
+          </Link>
+        </div>
       </div>
 
       <div className='flex gap-2 border-b pb-2'>

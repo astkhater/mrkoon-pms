@@ -250,6 +250,53 @@ cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
 .\push.ps1 "HR proxy entry + attention widget + RLS email-lookup fix"
 ```
 
+## Fifth batch (after your push of fourth batch)
+
+### Cycle periods admin UI ✓ (task #43)
+- `/admin/cycle-periods` — full CRUD over `config.cycle_periods`
+- Smart "add new" defaults to current quarter (label, start/end dates auto-computed)
+- ConfigPage now links to it
+- HR no longer needs SQL to add Q1 2027 (or any future period)
+
+### Calibration view ✓ (task #44)
+- `/appraisals/calibration` — pick cycle, see rating distribution histogram
+- Dept head scope (own dept only); HR/admin see all
+- Top-heavy warning when >30% of ratings are Exceeds/Exceptional
+- Full appraisal table per cycle with self/mgr/dept/final scores + open links
+- Link added to CycleListPage header
+
+### CSV export ✓ (task #45)
+- `utils/csv.js` — UTF-8 BOM (Excel-friendly with Arabic), proper quoting
+- Export buttons on:
+  - `/admin/users` (filtered roster)
+  - `/okrs` (all visible objectives + KRs with effective targets + formula_ref)
+  - `/kpis` (current view: My KPIs or Library)
+  - `/bonus` (current view: pending/approved/mine)
+  - `/appraisals/calibration` (cycle appraisals)
+
+### Files added (fifth batch)
+```
+NEW:
+  frontend/src/pages/admin/CyclePeriodsPanel.jsx
+  frontend/src/pages/appraisal/CalibrationPage.jsx
+  frontend/src/utils/csv.js
+
+MODIFIED:
+  frontend/src/App.jsx (routes for cycle-periods + calibration)
+  frontend/src/pages/admin/ConfigPage.jsx (links to Users + Cycle Periods)
+  frontend/src/pages/admin/UsersPanel.jsx (CSV)
+  frontend/src/components/okr/OKRTree.jsx (CSV)
+  frontend/src/pages/kpi/KPIDashboardPage.jsx (CSV)
+  frontend/src/pages/bonus/BonusViewPage.jsx (CSV)
+  frontend/src/pages/appraisal/CycleListPage.jsx (Calibration link)
+```
+
+### Deploy:
+```powershell
+cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
+.\push.ps1 "cycle periods admin + calibration view + CSV export everywhere"
+```
+
 ---
 
 ## Second batch (after first push) — additional autonomous work
