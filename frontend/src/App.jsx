@@ -16,8 +16,12 @@ import AdminDash from './pages/dashboards/AdminDash.jsx';
 import OKRListPage from './pages/okr/OKRListPage.jsx';
 import KPIDashboardPage from './pages/kpi/KPIDashboardPage.jsx';
 import KPIEntryPage from './pages/kpi/KPIEntryPage.jsx';
+import KPIBulkImportPage from './pages/kpi/KPIBulkImportPage.jsx';
+import KPITrendPage from './pages/kpi/KPITrendPage.jsx';
 import CadencePage from './pages/cadence/CadencePage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
+import PIPsPage from './pages/PIPsPage.jsx';
+import TeamPage from './pages/TeamPage.jsx';
 import CycleListPage from './pages/appraisal/CycleListPage.jsx';
 import AppraisalDetailPage from './pages/appraisal/AppraisalDetailPage.jsx';
 import CalibrationPage from './pages/appraisal/CalibrationPage.jsx';
@@ -64,8 +68,12 @@ export default function App() {
         <Route path='/okrs/*' element={<OKRListPage />} />
         <Route path='/kpis' element={<KPIDashboardPage />} />
         <Route path='/kpis/entry' element={<KPIEntryPage />} />
+        <Route path='/kpis/import' element={<RoleGate roles={['hr','admin','manager','dept_head']}><KPIBulkImportPage /></RoleGate>} />
+        <Route path='/kpis/:kpiId/trend' element={<KPITrendPage />} />
         <Route path='/cadence' element={<CadencePage />} />
         <Route path='/notifications' element={<NotificationsPage />} />
+        <Route path='/pips' element={<PIPsPage />} />
+        <Route path='/team' element={<RoleGate roles={['manager','dept_head','hr','admin','c_level']}><TeamPage /></RoleGate>} />
         <Route path='/appraisals' element={<CycleListPage />} />
         <Route path='/appraisals/calibration' element={<RoleGate roles={['dept_head','hr','admin','c_level']}><CalibrationPage /></RoleGate>} />
         <Route path='/appraisals/:id' element={<AppraisalDetailPage />} />

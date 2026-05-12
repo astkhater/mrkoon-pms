@@ -5,10 +5,12 @@ import { useLang } from '../../context/LangContext.jsx';
 
 const items = [
   { to: '/',                key: 'nav.dashboard',  roles: ['employee','manager','dept_head','hr','finance','c_level','admin'] },
+  { to: '/team',            key: 'nav.team',       roles: ['manager','dept_head','hr','admin','c_level'] },
   { to: '/okrs',            key: 'nav.okrs',       roles: ['employee','manager','dept_head','hr','finance','c_level','admin'] },
   { to: '/kpis',            key: 'nav.kpis',       roles: ['employee','manager','dept_head','hr','finance','c_level','admin'] },
   { to: '/cadence',         key: 'nav.cadence',    roles: ['manager','dept_head','hr','finance','c_level','admin'] },
   { to: '/appraisals',      key: 'nav.appraisals', roles: ['employee','manager','dept_head','hr','c_level','admin'] },
+  { to: '/pips',            key: 'nav.pips',       roles: ['manager','dept_head','hr','c_level','admin'] },
   { to: '/bonus',           key: 'nav.bonus',      roles: ['employee','manager','dept_head','finance','c_level','admin'] },
   { to: '/sops',            key: 'nav.sops',       roles: ['employee','manager','dept_head','hr','finance','c_level','admin'] },
   { to: '/audit',           key: 'nav.audit',      roles: ['hr','finance','c_level','admin'] },

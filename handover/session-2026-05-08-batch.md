@@ -297,6 +297,82 @@ cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
 .\push.ps1 "cycle periods admin + calibration view + CSV export everywhere"
 ```
 
+## Sixth batch (most recent autonomous work)
+
+### Bulk CSV import for KPI actuals ✓ (task #46)
+- `/kpis/import` (HR/admin/manager/dept_head only)
+- Inline minimal CSV parser (UTF-8 BOM aware, proper quoting)
+- Required headers: `employee_email,kpi_id,period_label,actual_value` + optional `comment`
+- Preview first 10 rows before run
+- Upsert behavior (updates if row exists, else inserts)
+- Reports ok/skipped/errors with detailed error list
+- Import button on `/kpis` page header (Export and Import buttons side by side — full data loop)
+
+### KPI trend chart ✓ (task #47)
+- `/kpis/:kpiId/trend` — click any KPI ID in the dashboard to open
+- Inline SVG bar chart of actuals over time (no chart library — zero deps)
+- Bars colored by ratio: green ≥1.0, amber ≥0.7, rose below
+- Dashed green target reference line (uses effective_target from calc.vw_kpi_target — picks up cascade from assumptions)
+- Employee scope picker for HR/manager
+- Full values table below chart
+
+### PIP (Performance Improvement Plan) workflow ✓ (task #48)
+- New table `track.pips` with RLS (employee/manager/HR/admin scope)
+- Auto-trigger on appraisal close: when final_rating falls in a `triggers_pip=true` band, opens a 90-day PIP and notifies employee + manager + HR
+- `/pips` page (manager/dept_head/HR/admin sidebar entry):
+  - Filter: Active / Closed / All
+  - Inline edit of plan_text, target_close_date
+  - Close as success / fail (records outcome + closed_by + timestamp)
+  - Status badges
+- Sidebar nav item
+
+### Manager team rollup ✓ (task #49)
+- `/team` page (manager/dept_head/HR/admin/c_level)
+- Sidebar entry "My Team"
+- Scope: manager → direct reports; dept_head → dept; HR/admin/c_level → all
+- Per-row stats: KPIs assigned, actuals submitted, RAG counts (green/amber/red), days since last entry (rose if >14 days), last appraisal status + final rating
+- Quick "enter →" link that opens KPI entry pre-selected for that employee (?employee=id query string)
+- Summary tiles at top: total actuals, RAG totals
+
+### Files added (sixth batch)
+```
+NEW:
+  database/schema/01g-pip-workflow-v1-20260508.sql
+  frontend/src/pages/kpi/KPIBulkImportPage.jsx
+  frontend/src/pages/kpi/KPITrendPage.jsx
+  frontend/src/pages/PIPsPage.jsx
+  frontend/src/pages/TeamPage.jsx
+
+MODIFIED:
+  frontend/src/App.jsx (3 new routes)
+  frontend/src/components/layout/Sidebar.jsx (PIPs + Team)
+  frontend/src/pages/kpi/KPIDashboardPage.jsx (Import button, KPI ID → trend link)
+  frontend/src/pages/kpi/KPIEntryPage.jsx (reads ?employee=id query param for pre-fill)
+  frontend/src/lang/en.js / ar.js (team, pips nav keys)
+```
+
+### Pending SQL to apply in Supabase:
+1. `database/rls-policies/03-rls-email-lookup-fix-v1-20260508.sql`
+2. `database/schema/01g-pip-workflow-v1-20260508.sql`
+
+### Final deploy:
+```powershell
+cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
+.\push.ps1 "bulk import + trend chart + PIP + team rollup"
+```
+
+## At this point — system is operationally complete
+
+Every workflow has end-to-end UX. Recap of capabilities for any user:
+- **Employee**: login → see "Needs attention" → enter KPI actuals → see trend → submit self-assessment → see appraisal progress + final rating
+- **Manager**: see team rollup with RAG / latest entries → enter on behalf of any direct report → approve OKRs → review appraisals → see PIPs
+- **Dept Head**: dept-wide team rollup → calibration view with distribution histogram → dept OKR approval
+- **HR**: open new cycle periods → open appraisal cycles → bulk-generate appraisals → CSV import for monthly close → sign off appraisals → manage users + permissions → see PIPs
+- **Finance**: see commission schemes → run commission for period → approve/hold/reject payouts → export CSV
+- **C-Level**: company-wide assumptions (SSOT) → company OKR overview → headcount by dept → cycle status
+- **Admin (you)**: everything above + audit log with diff view + notifications inbox
+
+
 ---
 
 ## Second batch (after first push) — additional autonomous work

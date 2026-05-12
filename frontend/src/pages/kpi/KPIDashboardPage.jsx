@@ -63,6 +63,11 @@ export default function KPIDashboardPage() {
               className='text-sm text-mrkoon hover:underline'
             >Export CSV</button>
           )}
+          {hasAccess(['hr','admin','manager','dept_head']) && (
+            <Link to='/kpis/import' className='text-sm border px-3 py-1.5 rounded hover:bg-slate-50'>
+              ⬆ Import CSV
+            </Link>
+          )}
           <Link to='/kpis/entry' className='text-sm bg-mrkoon text-white px-3 py-1.5 rounded hover:bg-mrkoon-dark'>
             {t('kpi.enter_actuals')} →
           </Link>
@@ -100,7 +105,9 @@ export default function KPIDashboardPage() {
                 <tbody>
                   {rows.map(k => k && (
                     <tr key={k.id} className='border-b last:border-0'>
-                      <td className='py-1.5 pe-3 font-mono text-xs text-slate-500'>{k.id}</td>
+                      <td className='py-1.5 pe-3 font-mono text-xs text-slate-500'>
+                        <Link to={`/kpis/${k.id}/trend`} className='hover:text-mrkoon hover:underline'>{k.id}</Link>
+                      </td>
                       <td className='py-1.5 pe-3'>
                         <div className='font-medium'>{lang === 'ar' ? k.name_ar : k.name_en}</div>
                         {k.formula_text && <div className='text-xs text-slate-400'>{k.formula_text}</div>}

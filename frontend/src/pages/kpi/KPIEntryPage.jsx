@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Card from '../../components/ui/Card.jsx';
 import Skeleton from '../../components/ui/Skeleton.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -118,7 +119,8 @@ export default function KPIEntryPage() {
   const { profile, hasAccess } = useAuth();
   const qc = useQueryClient();
   const canProxy = hasAccess(['hr','admin','manager','dept_head']);
-  const [proxyTargetId, setProxyTargetId] = useState(null);
+  const [searchParams] = useSearchParams();
+  const [proxyTargetId, setProxyTargetId] = useState(searchParams.get('employee') || null);
   const roster = useEmployeeRoster({
     canProxy,
     isHR: hasAccess(['hr']),

@@ -5,10 +5,12 @@ export default {
   },
   nav: {
     dashboard: 'Dashboard',
+    team: 'My Team',
     okrs: 'OKRs',
     kpis: 'KPIs',
     cadence: 'Cadence',
     appraisals: 'Appraisals',
+    pips: 'PIPs',
     bonus: 'Bonus & Commission',
     sops: 'SOPs',
     audit: 'Audit log',

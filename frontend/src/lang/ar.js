@@ -5,10 +5,12 @@ export default {
   },
   nav: {
     dashboard: 'لوحة التحكم',
+    team: 'الفريق',
     okrs: 'الأهداف',
     kpis: 'المؤشرات',
     cadence: 'الإيقاع',
     appraisals: 'التقييمات',
+    pips: 'خطط التحسين',
     bonus: 'الحوافز والعمولات',
     sops: 'إجراءات العمل',
     audit: 'سجل التدقيق',
