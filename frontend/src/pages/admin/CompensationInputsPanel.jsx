@@ -5,12 +5,13 @@ import { useTranslation } from '../../hooks/useTranslation.js';
 // Admin → Config → Compensation Inputs — D-34 Khater Q2
 // Tabs by scheme. Each tab edits config.compensation_rates rows for that scheme.
 // Khater fills BD rate scale + AM/VM/Ops values here.
+// Scheme IDs follow BCF version (v8 = current, post Hussein TL Gates 6-gate expansion 2026-05-12)
 const schemes = [
   { id: 'BD-COMM-Q-v7',    label: 'BD Acquisition (quarterly)' },
   { id: 'AM-COMM-v7',      label: 'AM (monthly, 6-component)' },
-  { id: 'VM-COMM-v7',      label: 'VM Sales (monthly, per-auction)' },
+  { id: 'VM-COMM-v8',      label: 'VM Sales v8 (monthly, per-auction)' },
   { id: 'OPS-BONUS-v7',    label: 'Ops Bonus (monthly)' },
-  { id: 'OPS-TL-GATES-v7', label: 'Ops TL Gates (monthly cap 5,500)' },
+  { id: 'OPS-TL-GATES-v8', label: 'Ops TL Gates v8 (6 gates, cap 6,500)' },
   { id: 'ONB-COMM-v7',     label: 'Onboarding (per-merchant)' },
   { id: 'OPEX-QTR-v7',     label: 'Quarterly OpEx Bonus' },
   { id: 'ANNUAL-BONUS-v7', label: 'Annual Bonus' },

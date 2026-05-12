@@ -361,6 +361,53 @@ cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
 .\push.ps1 "bulk import + trend chart + PIP + team rollup"
 ```
 
+## Seventh batch — BCF v8 migration + UX polish
+
+### BCF v8 (Hussein TL Gates 5→6) ✓ (task #52)
+Per Khater handoff 2026-05-12:
+- Added VM Gate 3: "Avg Active Bidders ≥4" — 1,000 EGP, linked to CO3.KR3
+- Hussein TL monthly cap 5,500 → 6,500
+- Bumped scheme refs: VM-COMM-v7 → v8, OPS-TL-GATES-v7 → v8
+- Gate 3 already renamed to "Report Compliance" during v6 KPI import (no-op now)
+- VM Gate 2 already named "Auction Price Quality" during v6 KPI import (no-op now)
+- Frontend CompensationInputsPanel updated to show v8 labels + new cap
+
+### Cmd+K command palette ✓ (task #50)
+- Press `Ctrl+K` / `⌘K` anywhere → instant search palette
+- Searches users (name/email), KPIs (id/name), OKRs (code/title), navigation shortcuts
+- Fuzzy-match scoring, arrow keys + Enter to navigate
+- Subtle "🔍 Ctrl+K" hint in Topbar
+
+### Help / quick-reference ✓ (task #51)
+- `/help` route — role-keyed reference card with deep links
+- Bilingual (EN/AR)
+- Linked from Topbar (small `?` icon)
+
+## Pending Supabase application
+1. `database/rls-policies/03-rls-email-lookup-fix-v1-20260508.sql`
+2. `database/schema/01g-pip-workflow-v1-20260508.sql`
+3. `database/seed-data/11-bcf-v8-r2-migration-20260512.sql`  ← time-versioned, future r3/r4/v9 safe
+
+### Files added (seventh batch)
+```
+NEW:
+  database/seed-data/11-bcf-v8-migration-20260512.sql
+  frontend/src/components/CommandPalette.jsx
+  frontend/src/pages/HelpPage.jsx
+
+MODIFIED:
+  frontend/src/components/layout/AppShell.jsx (mount palette)
+  frontend/src/components/layout/Topbar.jsx (Ctrl+K hint + Help link)
+  frontend/src/pages/admin/CompensationInputsPanel.jsx (v8 labels)
+  frontend/src/App.jsx (/help route)
+```
+
+### Final deploy:
+```powershell
+cd D:\Mrkoon\MrkoonCCoWPr\mrkoon-okr-build
+.\push.ps1 "bcf v8 + Cmd+K palette + Help page"
+```
+
 ## At this point — system is operationally complete
 
 Every workflow has end-to-end UX. Recap of capabilities for any user:

@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar.jsx';
 import Topbar from './Topbar.jsx';
+import CommandPalette from '../CommandPalette.jsx';
 
 export default function AppShell({ children }) {
   return (
@@ -10,6 +11,7 @@ export default function AppShell({ children }) {
         <Topbar />
         <main className='flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto'>{children}</main>
       </div>
+      <CommandPalette />
     </div>
   );
 }

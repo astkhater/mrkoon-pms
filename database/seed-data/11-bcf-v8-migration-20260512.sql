@@ -1,0 +1,6 @@
+-- DEPRECATED — do not run.
+-- Superseded by 11-bcf-v8-r2-migration-20260512.sql which uses time-versioned
+-- compensation_rates rows (effective_from/effective_to + revision tag in JSON)
+-- so future r3/r4/v9 land cleanly without losing history.
+-- This file was the v1 draft that overwrote rows in place — kept here only as
+-- a marker of the earlier approach.

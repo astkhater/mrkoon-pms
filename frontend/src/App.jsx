@@ -22,6 +22,7 @@ import CadencePage from './pages/cadence/CadencePage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import PIPsPage from './pages/PIPsPage.jsx';
 import TeamPage from './pages/TeamPage.jsx';
+import HelpPage from './pages/HelpPage.jsx';
 import CycleListPage from './pages/appraisal/CycleListPage.jsx';
 import AppraisalDetailPage from './pages/appraisal/AppraisalDetailPage.jsx';
 import CalibrationPage from './pages/appraisal/CalibrationPage.jsx';
@@ -74,6 +75,7 @@ export default function App() {
         <Route path='/notifications' element={<NotificationsPage />} />
         <Route path='/pips' element={<PIPsPage />} />
         <Route path='/team' element={<RoleGate roles={['manager','dept_head','hr','admin','c_level']}><TeamPage /></RoleGate>} />
+        <Route path='/help' element={<HelpPage />} />
         <Route path='/appraisals' element={<CycleListPage />} />
         <Route path='/appraisals/calibration' element={<RoleGate roles={['dept_head','hr','admin','c_level']}><CalibrationPage /></RoleGate>} />
         <Route path='/appraisals/:id' element={<AppraisalDetailPage />} />
