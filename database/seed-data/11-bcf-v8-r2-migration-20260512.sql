@@ -129,17 +129,7 @@ update def.kpis set scheme_ref='VM-COMM-v8' where id like 'VM-%';
 
 notify pgrst, 'reload schema';
 
--- =================================================================
--- HOW TO ADD r3 (or future r4, v9...) — TEMPLATE
--- =================================================================
--- 1. Update the do-block's v_rev variable: e.g. v_rev := 'v8-r3'
--- 2. Run the same UPDATE step that closes effective_to on rows being revised
--- 3. INSERT new rows with the same scheme_ref + new effective_from = today
--- 4. JSON revision tag tracks which rev introduced which value
--- That preserves a full time-series of every comp rate change.
--- =================================================================
-
--- Verification:
+-- Verification (run after the migration completes):
 -- select scheme_ref, key, value_numeric, effective_from, effective_to,
 --        value_json->>'revision' as rev
 --   from config.compensation_rates
