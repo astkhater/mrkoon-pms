@@ -57,8 +57,8 @@ values
   (uuid_generate_v4(), 'a.hesham@mrkoonapp.local',      'Aya Hesham Sayed',                'آية هشام سيد',                'employee', (select id from def.functional_roles where code='MKT-MGR'),   (select id from def.departments where code='MKT'), (select id from config.levels where code='L1'), true),
 
   -- Technology
-  (uuid_generate_v4(), 'h.soliman@mrkoonapp.local',     'El-Hussien Salah Hamed Soliman',  'الحسين صلاح حامد سليمان',    'manager',  (select id from def.functional_roles where code='TECH-PO'),   (select id from def.departments where code='TECH'),(select id from config.levels where code='L3'), true),
-  (uuid_generate_v4(), 'a.naeem@mrkoonapp.local',       'Abdelrahman Saleh Naeem',         'عبدالرحمن صالح نعيم',        'employee', (select id from def.functional_roles where code='TECH-MOB'),  (select id from def.departments where code='TECH'),(select id from config.levels where code='L2'), true),
+  (uuid_generate_v4(), 'a.naeem@mrkoonapp.local',       'Abdelrahman Saleh Naeem',         'عبدالرحمن صالح نعيم',        'manager',  (select id from def.functional_roles where code='TECH-TL'),   (select id from def.departments where code='TECH'),(select id from config.levels where code='L3'), true),
+  (uuid_generate_v4(), 'h.soliman@mrkoonapp.local',     'El-Hussien Salah Hamed Soliman',  'الحسين صلاح حامد سليمان',    'employee', (select id from def.functional_roles where code='TECH-PO'),   (select id from def.departments where code='TECH'),(select id from config.levels where code='L3'), true),
   (uuid_generate_v4(), 't.awad@mrkoonapp.local',        'Tarneem Hatem Awad',              'ترنيم حاتم عوض',             'employee', (select id from def.functional_roles where code='TECH-MOB'),  (select id from def.departments where code='TECH'),(select id from config.levels where code='L2'), true),
   (uuid_generate_v4(), 'a.ramadan@mrkoonapp.local',     'Ahmed Alaa Ramadan',              'أحمد علاء رمضان',            'employee', (select id from def.functional_roles where code='TECH-MOB'),  (select id from def.departments where code='TECH'),(select id from config.levels where code='L2'), true),
   (uuid_generate_v4(), 'r.ibrahiem@mrkoonapp.local',    'Rawan Sayed Ibrahiem',            'روان سيد إبراهيم',           'employee', (select id from def.functional_roles where code='TECH-MOB'),  (select id from def.departments where code='TECH'),(select id from config.levels where code='L2'), true),
@@ -109,7 +109,7 @@ update def.users set manager_id = (select id from def.users where email='y.hesha
 update def.users set manager_id = (select id from def.users where email='a.hassan@mrkoonapp.local')
   where email in ('h.hassan@mrkoonapp.local','m.saad@mrkoonapp.local','a.salah@mrkoonapp.local','a.hesham@mrkoonapp.local');
 
--- TECH: under CTO Ahmed Amir; El-Hussien is Sr PO
+-- TECH: under CTO Ahmed Amir; Abdelrahman Naeem is Engineering Team Leader; El-Hussien is Sr PO
 update def.users set manager_id = (select id from def.users where email='a.amir@mrkoonapp.local')
   where email = 'h.soliman@mrkoonapp.local';
 update def.users set manager_id = (select id from def.users where email='h.soliman@mrkoonapp.local')

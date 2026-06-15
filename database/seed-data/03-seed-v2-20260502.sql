@@ -72,6 +72,7 @@ insert into def.functional_roles (code, name_en, name_ar, department_id, level_i
   ('OPS-TL',    'Operations Team Lead',             'قائد فريق العمليات',  (select id from def.departments where code='OPS'), (select id from config.levels where code='L4')),
   ('ONB-SP',    'Onboarding Specialist',            'أخصائي تهيئة',       (select id from def.departments where code='ONB'), (select id from config.levels where code='L1')),
   ('MKT-MGR',   'Marketing Manager',                'مدير التسويق',       (select id from def.departments where code='MKT'), (select id from config.levels where code='L4')),
+  ('TECH-TL',   'Engineering Team Leader',          'قائد فريق هندسة',    (select id from def.departments where code='TECH'),(select id from config.levels where code='L3')),
   ('TECH-PO',   'Senior Product Owner',             'مالك منتج أول',      (select id from def.departments where code='TECH'),(select id from config.levels where code='L4')),
   ('TECH-MOB',  'Mobile Developer',                 'مطور موبايل',        (select id from def.departments where code='TECH'),(select id from config.levels where code='L2')),
   ('FIN-AC',    'Finance Accountant',               'محاسب',              (select id from def.departments where code='FIN'), (select id from config.levels where code='L2')),

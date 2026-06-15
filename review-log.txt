@@ -45,3 +45,19 @@ Owner: Khater | Workspace: mrkoon-okr-build
   Applied queued workspace fixes: sop-index MAP-001 pointer, sop-candidate map FIN01/FIN03 status revert
   Synced monitoring-cadence-matrix-v2 KPI Source to v6 KPI Master (byte-aligned)
   Backups: .PRE-FIX-20260502.xlsx per file
+
+[2026-05-12] Watch Mode + fix-all cycle
+  Files changed since last log: v6 KPI/KPI framework updated (May 7 KR remap, May 12 VM Gate 3), bonus framework v7→v8→v8-r2→v8-r3 (+ v9 draft), 7 new HR files, SOP body cleanups (KR4.5 + KR6.x stale refs removed)
+  Issues found: 7 (monitoring stale, appraisal divergence, v6-20260502 not archived [WRONG — was already archived], bonus 5 active versions, v9 status unclear, xref missing VM Gate 3, Excel lock file)
+  Fixes applied:
+    1. monitoring-cadence-matrix-v2 KPI Source → re-synced to v6-20260512 (byte-aligned)
+    2. appraisal v3 KPI Source delta check → 0 rows changed (hash diff was metadata only, no data fix needed)
+    3. v6-20260502 archive check → already in archived/ in all 3 locations (false flag)
+    4. Bonus framework: v7+v8+v8-r2 archived in both perf and shared/commission-schemes. Active = v8-r3 + v9 only.
+    6. sop-kpi-xref: VM-GATE-03 row added (49 total rows, 48 linkages, Last synced 2026-05-12)
+    7. Excel lock ~$bonus-commission-framework-v8-r3.xlsx → could not remove (Operation not permitted — likely active editor)
+  Flagged to CHRO (no fix applied):
+    - v9 status: v9 is more advanced than v8-r3 (7-Gate, 7-Scenario per Framework Overview) but CURRENT-VERSIONS.md still names v8-r3 canonical. Either ship v9 + update registry, or rename v9.DRAFT.
+    - Active editor on v8-r3 (lock file present) — CHRO may have v8-r3 open mid-edit
+  Backups: .PRE-FIX-20260512.xlsx per modified file
+
