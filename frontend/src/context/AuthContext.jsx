@@ -35,28 +35,28 @@ export function AuthProvider({ children }) {
     })();
   }, [session]);
 
-  // Hold off on resolving the role until profile actually loads after a fresh session,
-  // otherwise the home redirect routes to the employee fallback.
-  const role = profile?.role_code ?? (session && profile === null ? '__loading__' : null);
-  const permissions = profile?.permissions ?? [];
+  // ---- REAL role + permissions (from def.users) ----
+  const realRole = profile?.role_code ?? (session && profile === null ? '__loading__' : null);
+  const realPermissions = profile?.permissions ?? [];
 
-  // hasAccess('hr') returns true if role_code='hr' OR 'hr' in permissions array.
-  // Used by RoleGate and Sidebar to gate functional pages without forcing role_code
-  // to double as both org-position and access-tier.
-  function hasAccess(requiredRoles) {
-    if (!Array.isArray(requiredRoles)) requiredRoles = [requiredRoles];
-    if (requiredRoles.includes(role)) return true;
-    return requiredRoles.some(r => permissions.includes(r));
-  }
+  // ---- VIEW-AS OVERRIDE (admin-only UI/UX checker mode) ----
+  // Client-side only: changes which sidebar items + dashboards render.
+  // RLS is unchanged — the underlying user is still the real one, so data access
+  // is what the REAL user can see. Used purely for UX preview by admins.
+  const [viewAs, setViewAsState] = useState(() => {
+    try { return localStorage.getItem('mrk.viewAs') || null; } catch { return null; }
+  });
+  const setViewAs = (r) => {
+    try {
+      if (r) localStorage.setItem('mrk.viewAs', r);
+      else localStorage.removeItem('mrk.viewAs');
+    } catch {}
+    setViewAsState(r || null);
+  };
+  const clearViewAs = () => setViewAs(null);
 
-  async function signInWithMagicLink(email) {
-    return await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
-  }
-  async function signOut() { await supabase.auth.signOut(); }
+  // Only admins can engage view-as. Defensive guard if a non-admin somehow has it set.
+  const isRealAdmin = realRole === 'admin' || realPermissions.includes('admin');
+  const effectiveViewAs = isRealAdmin ? viewAs : null;
 
-  return (
-    <AuthCtx.Provider value={{ session, profile, role, permissions, hasAccess, loading, signInWithMagicLink, signOut }}>
-      {children}
-    </AuthCtx.Provider>
-  );
-}
+  // Effective role/perms used by sideba

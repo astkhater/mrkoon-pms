@@ -10,15 +10,10 @@ import AttentionCard from '../../components/AttentionCard.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
 
-function StatTile({ label, value, hint }) {
-  return (
-    <div className='rounded-md border bg-white p-3'>
-      <div className='text-xs text-slate-500'>{label}</div>
-      <div className='text-2xl font-semibold text-mrkoon mt-1'>{value}</div>
-      {hint && <div className='text-xs text-slate-400 mt-1'>{hint}</div>}
-    </div>
-  );
-}
+// Monitor-first ManagerDash. Reframe 2026-06-15.
+//   Lead with: pending approvals on team, team submission status
+//   Outcome cards: Team Status / Team Bonus / Team OKRs
+//   Builder shortcuts removed; manager doesn't configure things from home.
 
 function useTeam(managerId) {
   return useQuery({
@@ -37,87 +32,97 @@ function useTeam(managerId) {
   });
 }
 
+function useTeamPayouts(teamIds) {
+  return useQuery({
+    enabled: !!teamIds && teamIds.length > 0,
+    queryKey: ['team.payouts', teamIds],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .schema('track')
+        .from('commission_payouts')
+        .select('id, employee_id, total_amount, status')
+        .in('employee_id', teamIds)
+        .order('id', { ascending: false });
+      if (error) return [];
+      return data ?? [];
+    },
+  });
+}
+
+function fmtMoney(n) {
+  if (n == null) return '—';
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n) + ' EGP';
+}
+
 export default function ManagerDash() {
-  const { t, lang } = useTranslation();
+  const { lang } = useTranslation();
   const { profile } = useAuth();
   const team = useTeam(profile?.id);
   const okrs = useObjectives();
   const cycles = useActiveCycle();
+
+  const teamIds = (team.data ?? []).map(u => u.id);
+  const payouts = useTeamPayouts(teamIds);
 
   const myObjs = (okrs.data ?? []).filter(o =>
     o.owner_user_id === profile?.id ||
     (o.level === 'department' && o.department_id === profile?.department_id)
   );
 
+  const pendingTeamPayouts = (payouts.data ?? []).filter(p => p.status === 'draft' || p.status === 'pending_approval');
+  const approvedTeamTotal = (payouts.data ?? [])
+    .filter(p => p.status === 'approved')
+    .reduce((s, p) => s + (Number(p.total_amount) || 0), 0);
+
+  const openPeriod = (cycles.data ?? [])[0];
+  const name = profile ? (lang === 'ar' ? profile.full_name_ar : profile.full_name_en) : '';
+
   return (
-    <div className='space-y-6'>
-      <h1 className='text-2xl font-semibold'>
-        {t('dashboard.welcome')}{profile ? ', ' + (lang === 'ar' ? profile.full_name_ar : profile.full_name_en) : ''}
-      </h1>
+    <div className='space-y-5'>
+      <div>
+        <h1 className='text-2xl font-semibold'>
+          {lang === 'ar' ? 'مرحباً' : 'Welcome'}{name ? `, ${name}` : ''}
+        </h1>
+        <p className='text-sm text-slate-500 mt-1'>
+          {lang === 'ar'
+            ? 'صفحة قائد الفريق: تابع فريقك، اعتمد المؤشرات، راجع المكافآت.'
+            : 'Team lead view: monitor your team, approve KPIs, review payouts.'}
+        </p>
+      </div>
 
       <AttentionCard />
 
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
-        <StatTile
-          label={lang === 'ar' ? 'حجم الفريق' : 'Direct reports'}
-          value={team.isLoading ? '…' : team.data?.length ?? 0}
-          hint={lang === 'ar' ? 'موظف نشط' : 'active'}
-        />
-        <StatTile
-          label={t('dashboard.my_okrs')}
-          value={okrs.isLoading ? '…' : myObjs.length}
-        />
-        <StatTile
-          label={t('dashboard.period_open')}
-          value={cycles.data?.[0]?.label ?? '—'}
-        />
-        <StatTile
-          label={lang === 'ar' ? 'تقييمات بانتظاري' : 'Pending my review'}
-          value='0'
-          hint={t('common.no_data')}
-        />
-      </div>
-
-      <Card title={lang === 'ar' ? 'فريقي' : 'My team'}>
-        {team.isLoading ? <Skeleton count={4} className='h-8' /> : (
-          team.data?.length === 0 ? (
-            <div className='text-sm text-slate-500'>{lang === 'ar' ? 'لا يوجد موظفون مرتبطون بك' : 'No direct reports'}</div>
-          ) : (
-            <table className='w-full text-sm'>
-              <thead className='text-xs text-slate-500 border-b'>
-                <tr><th className='text-start py-1'>{lang === 'ar' ? 'الاسم' : 'Name'}</th><th className='text-start'>{lang === 'ar' ? 'الدور' : 'Role'}</th><th className='text-start'>{lang === 'ar' ? 'الحالة' : 'Status'}</th></tr>
-              </thead>
-              <tbody>
-                {team.data?.map(u => (
-                  <tr key={u.id} className='border-b last:border-0'>
-                    <td className='py-1.5'>{lang === 'ar' ? (u.full_name_ar || u.full_name_en) : u.full_name_en}</td>
-                    <td className='font-mono text-xs text-slate-500'>{u.role_code}</td>
-                    <td><span className='inline-block w-2 h-2 rounded-full bg-emerald-500 me-2'></span>{lang === 'ar' ? 'نشط' : 'active'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )
-        )}
-      </Card>
-
-      <Card title={t('dashboard.my_okrs')}>
-        {okrs.isLoading ? <Skeleton count={3} className='h-10' /> : (
-          myObjs.length === 0 ? (
-            <div className='text-sm text-slate-500'>{t('empty.no_okrs')}</div>
-          ) : (
-            <div className='space-y-1 text-sm'>
-              {myObjs.map(o => (
-                <Link key={o.id} to='/okrs' className='block border rounded p-2 hover:bg-slate-50'>
-                  <span className='text-xs text-slate-500 font-mono me-2'>{o.code}</span>
-                  {lang === 'ar' ? o.title_ar : o.title_en}
-                  <span className='ms-2 text-xs text-slate-400'>· {(o.key_results || []).length} KRs</span>
-                </Link>
-              ))}
+      {/* HERO CTA — Team Status (always relevant for a manager) */}
+      <Link
+        to='/team'
+        className='block rounded-xl border-2 border-mrkoon-accent bg-gradient-to-br from-mrkoon-green-tint to-white p-5 hover:shadow-md transition-shadow'
+      >
+        <div className='flex items-start justify-between gap-4'>
+          <div>
+            <div className='text-xs uppercase tracking-wider text-mrkoon-green font-semibold'>
+              {lang === 'ar' ? '◉ المهمة الأساسية' : '◉ Primary action'}
             </div>
-          )
-        )}
-      </Card>
-    </div>
-  );
-}
+            <div className='text-xl md:text-2xl font-semibold text-mrkoon mt-1'>
+              {lang === 'ar' ? 'تابع حالة فريقك' : "Check your team's status"}
+            </div>
+            <div className='text-sm text-slate-600 mt-1.5'>
+              {team.isLoading ? '…' : (
+                <>
+                  {team.data?.length ?? 0} {lang === 'ar' ? 'تقرير مباشر' : 'direct reports'}
+                  {openPeriod && (
+                    <span className='ms-2 text-slate-500'>
+                      · {lang === 'ar' ? 'فترة:' : 'period:'} <span className='font-medium'>{openPeriod.label}</span>
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+          <div className='text-3xl text-mrkoon-accent'>→</div>
+        </div>
+      </Link>
+
+      {/* Outcome cards */}
+      <div className='grid md:grid-cols-3 gap-4'>
+        <Card>
+          <div className='fle

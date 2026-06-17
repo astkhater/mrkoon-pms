@@ -12,15 +12,10 @@ import {
 } from '../../hooks/useDashboardStats.js';
 import AttentionCard from '../../components/AttentionCard.jsx';
 
-function StatTile({ label, value, hint }) {
-  return (
-    <div className='rounded-md border bg-white p-3'>
-      <div className='text-xs text-slate-500'>{label}</div>
-      <div className='text-2xl font-semibold text-mrkoon mt-1'>{value}</div>
-      {hint && <div className='text-xs text-slate-400 mt-1'>{hint}</div>}
-    </div>
-  );
-}
+// Monitor-first AdminDash. Reframe 2026-06-15.
+//   Lead with: system health (open period, pending invites, recent activity)
+//   Outcome cards: Open periods / KPI library status / Recent activity count
+//   Builder shortcuts move to a "Configuration" section at the bottom.
 
 function MiniBar({ label, count, total, color = 'bg-mrkoon' }) {
   const pct = total ? Math.round((count / total) * 100) : 0;
@@ -36,136 +31,151 @@ function MiniBar({ label, count, total, color = 'bg-mrkoon' }) {
 }
 
 export default function AdminDash() {
-  const { t, lang } = useTranslation();
+  const { lang } = useTranslation();
   const hc = useHeadcountStats();
   const kpi = useKPILibraryStats();
   const okr = useOKRStats();
   const audit = useRecentAudit(8);
   const cycles = useActiveCycle();
 
+  const openPeriod = (cycles.data ?? [])[0];
+
   return (
-    <div className='space-y-6'>
-      <div className='flex items-baseline justify-between'>
-        <h1 className='text-2xl font-semibold'>{t('nav.admin')} — {t('nav.dashboard')}</h1>
-        <Link to='/admin/config' className='text-sm text-mrkoon hover:underline'>
-          {t('admin.config')} →
-        </Link>
+    <div className='space-y-5'>
+      <div>
+        <h1 className='text-2xl font-semibold'>
+          {lang === 'ar' ? 'لوحة المسؤول' : 'Admin'}
+        </h1>
+        <p className='text-sm text-slate-500 mt-1'>
+          {lang === 'ar'
+            ? 'صحة النظام، الفترات المفتوحة، النشاط الأخير.'
+            : 'System health, open periods, recent activity.'}
+        </p>
       </div>
 
       <AttentionCard />
 
-      {/* Top KPI tiles */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
-        <StatTile
-          label={lang === 'ar' ? 'إجمالي الموظفين' : 'Active employees'}
-          value={hc.isLoading ? '…' : hc.data?.total ?? 0}
-          hint={lang === 'ar' ? 'في القاعدة' : 'in def.users'}
-        />
-        <StatTile
-          label={lang === 'ar' ? 'مكتبة المؤشرات' : 'KPI library'}
-          value={kpi.isLoading ? '…' : kpi.data?.total ?? 0}
-          hint={lang === 'ar' ? 'مؤشر معتمد' : 'KPIs defined'}
-        />
-        <StatTile
-          label={lang === 'ar' ? 'الأهداف النشطة' : 'Active objectives'}
-          value={okr.isLoading ? '…' : okr.data?.objCount ?? 0}
-          hint={`${okr.data?.krCount ?? 0} ${lang === 'ar' ? 'نتيجة رئيسية' : 'KRs'}`}
-        />
-        <StatTile
-          label={lang === 'ar' ? 'الدورات المفتوحة' : 'Open cycles'}
-          value={cycles.isLoading ? '…' : cycles.data?.length ?? 0}
-          hint={cycles.data?.[0]?.label ?? '—'}
-        />
-      </div>
-
-      {/* Headcount by dept + role */}
-      <div className='grid md:grid-cols-2 gap-4'>
-        <Card title={lang === 'ar' ? 'التوزيع حسب القسم' : 'Headcount by department'}>
-          {hc.isLoading ? <Skeleton count={6} className='h-3' /> : (
-            <div className='space-y-2'>
-              {Object.entries(hc.data?.byDept ?? {}).sort((a,b)=>b[1]-a[1]).map(([code,c]) => (
-                <MiniBar key={code} label={code} count={c} total={hc.data?.total ?? 0} />
-              ))}
+      {/* HERO CTA — Manage current period (admin's recurring action) */}
+      <Link
+        to='/admin/cycle-periods'
+        className='block rounded-xl border-2 border-mrkoon-accent bg-gradient-to-br from-mrkoon-green-tint to-white p-5 hover:shadow-md transition-shadow'
+      >
+        <div className='flex items-start justify-between gap-4'>
+          <div>
+            <div className='text-xs uppercase tracking-wider text-mrkoon-green font-semibold'>
+              {lang === 'ar' ? '◔ المهمة الأساسية' : '◔ Primary action'}
             </div>
-          )}
-        </Card>
-        <Card title={lang === 'ar' ? 'التوزيع حسب الدور' : 'Headcount by role'}>
-          {hc.isLoading ? <Skeleton count={6} className='h-3' /> : (
-            <div className='space-y-2'>
-              {Object.entries(hc.data?.byRole ?? {}).sort((a,b)=>b[1]-a[1]).map(([role,c]) => (
-                <MiniBar key={role} label={role} count={c} total={hc.data?.total ?? 0} color='bg-emerald-600' />
-              ))}
+            <div className='text-xl md:text-2xl font-semibold text-mrkoon mt-1'>
+              {lang === 'ar' ? 'إدارة فترات الدورات' : 'Manage cycle periods'}
             </div>
-          )}
-        </Card>
-      </div>
-
-      {/* KPI library breakdown */}
-      <div className='grid md:grid-cols-3 gap-4'>
-        <Card title={lang === 'ar' ? 'المؤشرات حسب التكرار' : 'KPIs by frequency'}>
-          {kpi.isLoading ? <Skeleton count={5} className='h-3' /> : (
-            <div className='space-y-2'>
-              {['daily','weekly','monthly','quarterly','annual'].map(f => (
-                <MiniBar key={f} label={t(`kpi.${f}`)} count={kpi.data?.byFreq?.[f] ?? 0} total={kpi.data?.total ?? 0} color='bg-amber-500' />
-              ))}
+            <div className='text-sm text-slate-600 mt-1.5'>
+              {openPeriod ? (
+                <>
+                  {lang === 'ar' ? 'الفترة المفتوحة:' : 'Open period:'}{' '}
+                  <span className='font-medium'>{openPeriod.label}</span>
+                  <span className='ms-2 text-slate-500'>· {cycles.data?.length ?? 0} {lang === 'ar' ? 'دورة نشطة' : 'cycles open'}</span>
+                </>
+              ) : (
+                <span className='text-amber-600'>
+                  {lang === 'ar' ? '⚠ لا توجد فترات مفتوحة — افتح واحدة لبدء الإدخال' : '⚠ No open period — open one to enable entry'}
+                </span>
+              )}
             </div>
-          )}
-        </Card>
-        <Card title={lang === 'ar' ? 'المؤشرات حسب النوع' : 'KPIs by weight type'}>
-          {kpi.isLoading ? <Skeleton count={4} className='h-3' /> : (
-            <div className='space-y-2'>
-              {['scored','gate','monitor','dashboard'].map(t2 => (
-                <MiniBar key={t2} label={t2} count={kpi.data?.byType?.[t2] ?? 0} total={kpi.data?.total ?? 0} color='bg-slate-500' />
-              ))}
-            </div>
-          )}
-        </Card>
-        <Card title={lang === 'ar' ? 'المؤشرات حسب القسم' : 'KPIs by team prefix'}>
-          {kpi.isLoading ? <Skeleton count={6} className='h-3' /> : (
-            <div className='space-y-2'>
-              {Object.entries(kpi.data?.byPrefix ?? {}).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([p,c]) => (
-                <MiniBar key={p} label={p} count={c} total={kpi.data?.total ?? 0} color='bg-indigo-500' />
-              ))}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {/* Recent audit events */}
-      <Card title={lang === 'ar' ? 'أحدث أحداث التدقيق' : 'Recent audit events'}>
-        {audit.isLoading ? <Skeleton count={4} className='h-4' /> : (audit.data?.length === 0 ? (
-          <div className='text-sm text-slate-500'>{t('common.no_data')}</div>
-        ) : (
-          <table className='w-full text-sm'>
-            <thead className='text-xs text-slate-500 border-b'>
-              <tr><th className='text-start py-1'>When</th><th className='text-start'>Action</th><th className='text-start'>Where</th><th className='text-start'>Row</th></tr>
-            </thead>
-            <tbody>
-              {audit.data?.map(e => (
-                <tr key={e.id} className='border-b last:border-0'>
-                  <td className='py-1 text-slate-500 whitespace-nowrap'>{new Date(e.at).toLocaleString()}</td>
-                  <td className='font-mono text-xs'>{e.action}</td>
-                  <td className='text-slate-700'>{e.schema_name}.{e.table_name}</td>
-                  <td className='text-slate-400 text-xs truncate max-w-[200px]'>{e.row_pk}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ))}
-      </Card>
-
-      {/* Quick links */}
-      <Card title={lang === 'ar' ? 'إجراءات سريعة' : 'Quick actions'}>
-        <div className='grid sm:grid-cols-3 md:grid-cols-6 gap-2 text-sm'>
-          <Link to='/admin/config' className='border rounded p-2 hover:bg-slate-50'>{t('admin.config')}</Link>
-          <Link to='/admin/assumptions' className='border rounded p-2 hover:bg-slate-50 bg-amber-50'>📊 Assumptions</Link>
-          <Link to='/admin/kpi-master' className='border rounded p-2 hover:bg-slate-50'>{t('admin.kpis')}</Link>
-          <Link to='/admin/users' className='border rounded p-2 hover:bg-slate-50'>👤 {t('admin.users')}</Link>
-          <Link to='/admin/levels' className='border rounded p-2 hover:bg-slate-50'>{t('admin.salary_bands')}</Link>
-          <Link to='/audit' className='border rounded p-2 hover:bg-slate-50'>{t('nav.audit')}</Link>
-          <Link to='/okrs' className='border rounded p-2 hover:bg-slate-50'>{t('nav.okrs')}</Link>
+          </div>
+          <div className='text-3xl text-mrkoon-accent'>→</div>
         </div>
+      </Link>
+
+      {/* Outcome cards */}
+      <div className='grid md:grid-cols-3 gap-4'>
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'الموظفون النشطون' : 'Active employees'}
+            </div>
+            <Link to='/admin/users' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'القائمة ←' : 'Manage →'}
+            </Link>
+          </div>
+          {hc.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon'>{hc.data?.total ?? 0}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {Object.keys(hc.data?.byDept ?? {}).length} {lang === 'ar' ? 'قسم' : 'departments'}
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'مكتبة المؤشرات' : 'KPI library'}
+            </div>
+            <Link to='/admin/kpi-master' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'الكتالوج ←' : 'Catalog →'}
+            </Link>
+          </div>
+          {kpi.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon'>{kpi.data?.total ?? 0}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {okr.data?.objCount ?? 0} {lang === 'ar' ? 'هدف نشط' : 'OKRs'} · {okr.data?.krCount ?? 0} KRs
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'النشاط الأخير' : 'Recent activity'}
+            </div>
+            <Link to='/audit' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'السجل ←' : 'Audit log →'}
+            </Link>
+          </div>
+          {audit.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon'>{audit.data?.length ?? 0}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? 'حدث في آخر تحديث' : 'events in current view'}
+              </div>
+            </>
+          )}
+        </Card>
+      </div>
+
+      {/* Recent audit feed */}
+      <Card title={lang === 'ar' ? 'النشاط الأخير' : 'Recent activity'}>
+        {audit.isLoading ? <Skeleton count={4} className='h-4' /> : (
+          audit.data?.length === 0 ? (
+            <div className='text-sm text-slate-500'>
+              {lang === 'ar' ? 'لا يوجد نشاط' : 'No activity'}
+            </div>
+          ) : (
+            <table className='w-full text-sm'>
+              <thead className='text-xs text-slate-500 border-b'>
+                <tr>
+                  <th className='text-start py-1'>{lang === 'ar' ? 'الوقت' : 'When'}</th>
+                  <th className='text-start'>{lang === 'ar' ? 'الإجراء' : 'Action'}</th>
+                  <th className='text-start'>{lang === 'ar' ? 'الموضع' : 'Where'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {audit.data?.map(e => (
+                  <tr key={e.id} className='border-b last:border-0'>
+                    <td className='py-1 text-slate-500 whitespace-nowrap text-xs'>{new Date(e.at).toLocaleString()}</td>
+                    <td className='font-mono text-xs'>{e.action}</td>
+                    <td className='text-slate-700 text-xs'>{e.schema_name}.{e.table_name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )
+        )}
       </Card>
-    </div>
-  );
-}
+
+      {/* Configuration — collapsed, builder shortcuts here */}
+      <details className='group'>
+        <summary className='cursor-pointer text-sm font-medium text-slate-600 hover:te

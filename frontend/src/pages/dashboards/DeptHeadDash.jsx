@@ -10,15 +10,10 @@ import AttentionCard from '../../components/AttentionCard.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../utils/supabase.js';
 
-function StatTile({ label, value, hint }) {
-  return (
-    <div className='rounded-md border bg-white p-3'>
-      <div className='text-xs text-slate-500'>{label}</div>
-      <div className='text-2xl font-semibold text-mrkoon mt-1'>{value}</div>
-      {hint && <div className='text-xs text-slate-400 mt-1'>{hint}</div>}
-    </div>
-  );
-}
+// Monitor-first DeptHeadDash. Reframe 2026-06-15.
+//   Lead with: department health (calibration readiness, submission compliance)
+//   Outcome cards: Dept performance / Dept OKRs / Dept Bonus total
+//   Roster compact at bottom — not the headline.
 
 function useDeptUsers(deptId) {
   return useQuery({
@@ -37,87 +32,100 @@ function useDeptUsers(deptId) {
   });
 }
 
+function useDeptPayouts(deptUserIds) {
+  return useQuery({
+    enabled: deptUserIds.length > 0,
+    queryKey: ['dept.payouts', deptUserIds],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .schema('track')
+        .from('commission_payouts')
+        .select('id, employee_id, total_amount, status')
+        .in('employee_id', deptUserIds);
+      if (error) return [];
+      return data ?? [];
+    },
+  });
+}
+
+function fmtMoney(n) {
+  if (n == null) return '—';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K EGP';
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n) + ' EGP';
+}
+
 export default function DeptHeadDash() {
-  const { t, lang } = useTranslation();
+  const { lang } = useTranslation();
   const { profile } = useAuth();
   const deptUsers = useDeptUsers(profile?.department_id);
   const okrs = useObjectives();
   const depts = useDepartments();
   const cycles = useActiveCycle();
 
+  const userIds = (deptUsers.data ?? []).map(u => u.id);
+  const payouts = useDeptPayouts(userIds);
+
   const myDept = depts.data?.find(d => d.id === profile?.department_id);
+  const deptName = lang === 'ar' ? (myDept?.name_ar || 'قسمي') : (myDept?.name_en || 'My department');
+
   const deptObjs = (okrs.data ?? []).filter(o =>
-    (o.level === 'department' && o.department_id === profile?.department_id) ||
-    (o.level === 'company') // dept heads see company OKRs too
+    o.level === 'department' && o.department_id === profile?.department_id
   );
+  const companyObjs = (okrs.data ?? []).filter(o => o.level === 'company');
+
+  const approvedTotal = (payouts.data ?? [])
+    .filter(p => p.status === 'approved')
+    .reduce((s, p) => s + (Number(p.total_amount) || 0), 0);
+
+  const openPeriod = (cycles.data ?? [])[0];
 
   return (
-    <div className='space-y-6'>
-      <h1 className='text-2xl font-semibold'>
-        {t('nav.dashboard')} — {lang === 'ar' ? (myDept?.name_ar || 'رئيس قسم') : (myDept?.name_en || 'Department Head')}
-      </h1>
+    <div className='space-y-5'>
+      <div>
+        <h1 className='text-2xl font-semibold'>{deptName}</h1>
+        <p className='text-sm text-slate-500 mt-1'>
+          {lang === 'ar'
+            ? 'نظرة شاملة على القسم: الأداء، الأهداف، المعايرة.'
+            : 'Department overview: performance, objectives, calibration.'}
+        </p>
+      </div>
 
       <AttentionCard />
 
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
-        <StatTile
-          label={lang === 'ar' ? 'الموظفون في قسمي' : 'My department'}
-          value={deptUsers.isLoading ? '…' : deptUsers.data?.length ?? 0}
-        />
-        <StatTile
-          label={lang === 'ar' ? 'أهداف القسم' : 'Dept objectives'}
-          value={okrs.isLoading ? '…' : deptObjs.filter(o => o.level === 'department').length}
-        />
-        <StatTile
-          label={lang === 'ar' ? 'أهداف الشركة' : 'Company objectives'}
-          value={okrs.isLoading ? '…' : deptObjs.filter(o => o.level === 'company').length}
-        />
-        <StatTile
-          label={t('dashboard.period_open')}
-          value={cycles.data?.[0]?.label ?? '—'}
-        />
-      </div>
-
-      <Card title={lang === 'ar' ? 'فريق القسم' : 'Department roster'}>
-        {deptUsers.isLoading ? <Skeleton count={5} className='h-8' /> : (
-          deptUsers.data?.length === 0 ? (
-            <div className='text-sm text-slate-500'>{t('common.no_data')}</div>
-          ) : (
-            <table className='w-full text-sm'>
-              <thead className='text-xs text-slate-500 border-b'>
-                <tr><th className='text-start py-1'>{lang === 'ar' ? 'الاسم' : 'Name'}</th><th className='text-start'>{lang === 'ar' ? 'الدور' : 'Role'}</th></tr>
-              </thead>
-              <tbody>
-                {deptUsers.data?.map(u => (
-                  <tr key={u.id} className='border-b last:border-0'>
-                    <td className='py-1.5'>{lang === 'ar' ? (u.full_name_ar || u.full_name_en) : u.full_name_en}</td>
-                    <td className='font-mono text-xs text-slate-500'>{u.role_code}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )
-        )}
-      </Card>
-
-      <Card title={lang === 'ar' ? 'الأهداف ذات الصلة' : 'Related objectives'}>
-        {okrs.isLoading ? <Skeleton count={3} className='h-10' /> : (
-          deptObjs.length === 0 ? (
-            <div className='text-sm text-slate-500'>{t('empty.no_okrs')}</div>
-          ) : (
-            <div className='space-y-1 text-sm'>
-              {deptObjs.map(o => (
-                <Link key={o.id} to='/okrs' className='block border rounded p-2 hover:bg-slate-50'>
-                  <span className={`text-xs me-2 px-1.5 py-0.5 rounded ${o.level === 'company' ? 'bg-mrkoon/10 text-mrkoon' : 'bg-emerald-100 text-emerald-700'}`}>{o.level}</span>
-                  <span className='text-xs text-slate-500 font-mono me-2'>{o.code}</span>
-                  {lang === 'ar' ? o.title_ar : o.title_en}
-                  <span className='ms-2 text-xs text-slate-400'>· {(o.key_results || []).length} KRs</span>
-                </Link>
-              ))}
+      {/* HERO CTA — Calibration */}
+      <Link
+        to='/appraisals/calibration'
+        className='block rounded-xl border-2 border-mrkoon-accent bg-gradient-to-br from-mrkoon-green-tint to-white p-5 hover:shadow-md transition-shadow'
+      >
+        <div className='flex items-start justify-between gap-4'>
+          <div>
+            <div className='text-xs uppercase tracking-wider text-mrkoon-green font-semibold'>
+              {lang === 'ar' ? '⚖ المهمة الأساسية' : '⚖ Primary action'}
             </div>
-          )
-        )}
-      </Card>
-    </div>
-  );
-}
+            <div className='text-xl md:text-2xl font-semibold text-mrkoon mt-1'>
+              {lang === 'ar' ? 'راجع معايرة تقييمات القسم' : 'Calibrate department ratings'}
+            </div>
+            <div className='text-sm text-slate-600 mt-1.5'>
+              {deptUsers.data?.length ?? 0} {lang === 'ar' ? 'موظف' : 'employees'}
+              {openPeriod && (
+                <span className='ms-2 text-slate-500'>
+                  · {lang === 'ar' ? 'فترة:' : 'period:'} <span className='font-medium'>{openPeriod.label}</span>
+                </span>
+              )}
+            </div>
+          </div>
+          <div className='text-3xl text-mrkoon-accent'>→</div>
+        </div>
+      </Link>
+
+      {/* Outcome cards */}
+      <div className='grid md:grid-cols-3 gap-4'>
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'أهداف القسم' : 'Dept OKRs'}
+            </div>
+            <Link to='/okrs' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'الكل ←' : 'View all →'}
+            </Link>
+          
