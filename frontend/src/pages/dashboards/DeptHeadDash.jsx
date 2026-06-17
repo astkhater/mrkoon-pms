@@ -128,4 +128,77 @@ export default function DeptHeadDash() {
             <Link to='/okrs' className='text-xs text-mrkoon-accent hover:underline'>
               {lang === 'ar' ? 'الكل ←' : 'View all →'}
             </Link>
-          
+          </div>
+          {okrs.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon'>{deptObjs.length}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? `هدف نشط · ${companyObjs.length} على مستوى الشركة` : `active · ${companyObjs.length} company-level above`}
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'مكافآت القسم' : 'Dept bonus pool'}
+            </div>
+            <Link to='/bonus' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'التفاصيل ←' : 'Details →'}
+            </Link>
+          </div>
+          {payouts.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon-green'>{fmtMoney(approvedTotal)}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? 'معتمد لقسمك' : 'approved this cycle'}
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'الموظفون' : 'Headcount'}
+            </div>
+            <Link to='/team' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'القائمة ←' : 'Roster →'}
+            </Link>
+          </div>
+          {deptUsers.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon'>{deptUsers.data?.length ?? 0}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? 'موظف نشط في قسمك' : 'active in your department'}
+              </div>
+            </>
+          )}
+        </Card>
+      </div>
+
+      {/* Dept OKR list */}
+      <Card title={lang === 'ar' ? 'أهداف القسم النشطة' : 'Active department objectives'}>
+        {okrs.isLoading ? <Skeleton count={3} className='h-10' /> : (
+          deptObjs.length === 0 ? (
+            <div className='text-sm text-slate-500'>
+              {lang === 'ar' ? 'لا توجد أهداف نشطة لقسمك' : 'No active objectives for your department'}
+            </div>
+          ) : (
+            <div className='space-y-1 text-sm'>
+              {deptObjs.map(o => (
+                <Link key={o.id} to='/okrs' className='block border rounded p-2 hover:bg-slate-50'>
+                  <span className='text-xs me-2 px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700'>dept</span>
+                  <span className='text-xs text-slate-500 font-mono me-2'>{o.code}</span>
+                  {lang === 'ar' ? o.title_ar : o.title_en}
+                  <span className='ms-2 text-xs text-slate-400'>· {(o.key_results || []).length} KRs</span>
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+      </Card>
+    </div>
+  );
+}

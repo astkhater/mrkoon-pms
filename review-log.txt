@@ -61,3 +61,13 @@ Owner: Khater | Workspace: mrkoon-okr-build
     - Active editor on v8-r3 (lock file present) — CHRO may have v8-r3 open mid-edit
   Backups: .PRE-FIX-20260512.xlsx per modified file
 
+
+[2026-05-12] Full review pass for KPI session + KPI App Build session
+  Issues for KPI session (5): Tech PO weight 0.75 regression, 5 KPIs missing KR refs, KR5.4 orphan (22 cells), sop-kpi-xref stale pointer, MAP-001 versioning hygiene
+  Issues for build session (2): write v9 BCF migration, hold weight ingest from v6 KPI Master until KPI fixes land
+  Both paste-notes produced:
+    - mrkoon-okr-build/handover/paste-to-kpi-session-20260512.md
+    - mrkoon-okr-build/handover/paste-to-build-session-20260512.md
+  Build session unblocked for v9 BCF migration (parallel work — independent of weight ingest)
+  Final ingest gated on KPI session signal (paste-note clear-to-ingest-*.md)
+

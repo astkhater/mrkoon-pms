@@ -125,4 +125,101 @@ export default function ManagerDash() {
       {/* Outcome cards */}
       <div className='grid md:grid-cols-3 gap-4'>
         <Card>
-          <div className='fle
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'بانتظار موافقتك' : 'Pending your approval'}
+            </div>
+            <Link to='/team' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'افتح ←' : 'Open →'}
+            </Link>
+          </div>
+          {payouts.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className={'text-3xl font-semibold ' + (pendingTeamPayouts.length > 0 ? 'text-amber-600' : 'text-slate-300')}>
+                {pendingTeamPayouts.length}
+              </div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? 'دفعات مكافآت بانتظار المراجعة' : 'bonus payouts awaiting review'}
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'مكافآت الفريق' : 'Team bonus'}
+            </div>
+            <Link to='/team?view=bonus' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'التفاصيل ←' : 'Details →'}
+            </Link>
+          </div>
+          {payouts.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon-green'>{fmtMoney(approvedTeamTotal)}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? 'إجمالي المعتمد لفريقك' : 'approved for your team to date'}
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <div className='flex items-center justify-between mb-2'>
+            <div className='text-sm font-medium text-mrkoon'>
+              {lang === 'ar' ? 'أهداف الفريق' : 'Team OKRs'}
+            </div>
+            <Link to='/okrs' className='text-xs text-mrkoon-accent hover:underline'>
+              {lang === 'ar' ? 'الكل ←' : 'View all →'}
+            </Link>
+          </div>
+          {okrs.isLoading ? <Skeleton count={2} className='h-6' /> : (
+            <>
+              <div className='text-3xl font-semibold text-mrkoon'>{myObjs.length}</div>
+              <div className='text-xs text-slate-500 mt-1'>
+                {lang === 'ar' ? 'هدف نشط' : 'active objectives'}
+              </div>
+            </>
+          )}
+        </Card>
+      </div>
+
+      {/* Compact team list */}
+      <Card title={lang === 'ar' ? 'فريقي' : 'My team'}>
+        {team.isLoading ? <Skeleton count={4} className='h-8' /> : (
+          team.data?.length === 0 ? (
+            <div className='text-sm text-slate-500'>
+              {lang === 'ar' ? 'لا يوجد تقارير مباشرة' : 'No direct reports'}
+            </div>
+          ) : (
+            <table className='w-full text-sm'>
+              <thead className='text-xs text-slate-500 border-b'>
+                <tr>
+                  <th className='text-start py-1'>{lang === 'ar' ? 'الاسم' : 'Name'}</th>
+                  <th className='text-start'>{lang === 'ar' ? 'الدور' : 'Role'}</th>
+                  <th className='text-end'>{lang === 'ar' ? 'إجراء' : 'Action'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {team.data?.map(u => (
+                  <tr key={u.id} className='border-b last:border-0'>
+                    <td className='py-1.5'>{lang === 'ar' ? (u.full_name_ar || u.full_name_en) : u.full_name_en}</td>
+                    <td className='font-mono text-xs text-slate-500'>{u.role_code}</td>
+                    <td className='text-end'>
+                      <Link
+                        to={`/kpis/entry?employee=${u.id}`}
+                        className='text-xs text-mrkoon-accent hover:underline'
+                      >
+                        {lang === 'ar' ? 'إدخال نيابة ←' : 'Enter on behalf →'}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )
+        )}
+      </Card>
+    </div>
+  );
+}

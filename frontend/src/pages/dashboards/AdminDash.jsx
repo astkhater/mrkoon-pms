@@ -178,4 +178,47 @@ export default function AdminDash() {
 
       {/* Configuration — collapsed, builder shortcuts here */}
       <details className='group'>
-        <summary className='cursor-pointer text-sm font-medium text-slate-600 hover:te
+        <summary className='cursor-pointer text-sm font-medium text-slate-600 hover:text-mrkoon flex items-center gap-2'>
+          <span className='group-open:rotate-90 transition-transform inline-block'>▸</span>
+          {lang === 'ar' ? '⚙ الإعدادات وإحصاءات النظام' : '⚙ Configuration & system stats'}
+        </summary>
+
+        <div className='mt-3 space-y-4'>
+          <Card title={lang === 'ar' ? 'إجراءات سريعة' : 'Quick configuration'}>
+            <div className='grid sm:grid-cols-3 md:grid-cols-4 gap-2 text-sm'>
+              <Link to='/admin/config'              className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? 'كل الإعدادات' : 'All settings'}</Link>
+              <Link to='/admin/assumptions'         className='border rounded p-2 hover:bg-slate-50 bg-amber-50'>{lang === 'ar' ? '📊 الافتراضات' : '📊 Assumptions'}</Link>
+              <Link to='/admin/kpi-master'          className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? 'مكتبة المؤشرات' : 'KPI catalog'}</Link>
+              <Link to='/admin/cycle-periods'       className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? 'فترات الدورة' : 'Cycle periods'}</Link>
+              <Link to='/admin/compensation-inputs' className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? 'مدخلات التعويضات' : 'Compensation inputs'}</Link>
+              <Link to='/admin/levels'              className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? 'المستويات والأدوار' : 'Levels & roles'}</Link>
+              <Link to='/admin/users'               className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? '👤 المستخدمون' : '👤 Users'}</Link>
+              <Link to='/audit'                     className='border rounded p-2 hover:bg-slate-50'>{lang === 'ar' ? 'سجل التدقيق' : 'Audit log'}</Link>
+            </div>
+          </Card>
+
+          <div className='grid md:grid-cols-2 gap-4'>
+            <Card title={lang === 'ar' ? 'التوزيع حسب القسم' : 'Headcount by department'}>
+              {hc.isLoading ? <Skeleton count={6} className='h-3' /> : (
+                <div className='space-y-2'>
+                  {Object.entries(hc.data?.byDept ?? {}).sort((a,b)=>b[1]-a[1]).map(([code,c]) => (
+                    <MiniBar key={code} label={code} count={c} total={hc.data?.total ?? 0} />
+                  ))}
+                </div>
+              )}
+            </Card>
+            <Card title={lang === 'ar' ? 'التوزيع حسب الدور' : 'Headcount by role'}>
+              {hc.isLoading ? <Skeleton count={6} className='h-3' /> : (
+                <div className='space-y-2'>
+                  {Object.entries(hc.data?.byRole ?? {}).sort((a,b)=>b[1]-a[1]).map(([role,c]) => (
+                    <MiniBar key={role} label={role} count={c} total={hc.data?.total ?? 0} color='bg-emerald-600' />
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
+        </div>
+      </details>
+    </div>
+  );
+}

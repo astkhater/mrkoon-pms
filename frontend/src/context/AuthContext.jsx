@@ -59,4 +59,33 @@ export function AuthProvider({ children }) {
   const isRealAdmin = realRole === 'admin' || realPermissions.includes('admin');
   const effectiveViewAs = isRealAdmin ? viewAs : null;
 
-  // Effective role/perms used by sideba
+  // Effective role/perms used by sidebar, dashboards, RoleGate, RoleHome
+  const role = effectiveViewAs ?? realRole;
+  const permissions = effectiveViewAs ? [] : realPermissions;
+
+  // hasAccess('hr') returns true if role_code='hr' OR 'hr' in permissions array.
+  // Used by RoleGate and Sidebar to gate functional pages without forcing role_code
+  // to double as both org-position and access-tier.
+  function hasAccess(requiredRoles) {
+    if (!Array.isArray(requiredRoles)) requiredRoles = [requiredRoles];
+    if (requiredRoles.includes(role)) return true;
+    return requiredRoles.some(r => permissions.includes(r));
+  }
+
+  async function signInWithMagicLink(email) {
+    return await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
+  }
+  async function signOut() { await supabase.auth.signOut(); }
+
+  return (
+    <AuthCtx.Provider value={{
+      session, profile,
+      role, permissions, hasAccess,
+      realRole, realPermissions, isRealAdmin,
+      viewAs: effectiveViewAs, setViewAs, clearViewAs,
+      loading, signInWithMagicLink, signOut,
+    }}>
+      {children}
+    </AuthCtx.Provider>
+  );
+}

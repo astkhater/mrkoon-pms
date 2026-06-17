@@ -170,4 +170,47 @@ export default function CLevelDash() {
               {lang === 'ar' ? 'لا توجد أهداف' : 'No objectives defined'}
             </div>
           ) : (
-            <d
+            <div className='space-y-2'>
+              {companyObjs.map(o => (
+                <Link to='/okrs' key={o.id} className='block border rounded p-3 hover:bg-slate-50'>
+                  <div className='flex items-baseline justify-between'>
+                    <div className='flex items-baseline gap-2'>
+                      <span className='text-xs text-slate-500 font-mono'>{o.code}</span>
+                      <span className='font-medium'>{lang === 'ar' ? o.title_ar : o.title_en}</span>
+                    </div>
+                    <span className='text-xs text-slate-400'>{(o.key_results || []).length} KRs</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+      </Card>
+
+      {/* Assumptions — demoted reference */}
+      <details className='group'>
+        <summary className='cursor-pointer text-sm font-medium text-slate-600 hover:text-mrkoon flex items-center gap-2'>
+          <span className='group-open:rotate-90 transition-transform inline-block'>▸</span>
+          {lang === 'ar' ? 'الافتراضات المؤسسية (مرجع)' : 'Company assumptions (reference)'}
+        </summary>
+        <Card>
+          {assumptions.isLoading ? <Skeleton count={4} className='h-3' /> : (
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-3 text-sm'>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'هدف الربح' : 'GP Target'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtMoney(A.gp_target_annual?.value_numeric)}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'توقع الربح' : 'GP Forecast'}</div><div className='text-lg font-semibold text-emerald-600'>{fmtMoney(A.gp_forecast_annual?.value_numeric)}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'هامش' : 'Margin'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.blended_gp_margin?.value_numeric)}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'استحواذ' : 'New Clients'}</div><div className='text-lg font-semibold text-mrkoon'>{A.new_clients_year_target?.value_numeric ?? '—'}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'GMV أسبوعي' : 'Weekly GMV'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtMoney(A.weekly_gmv_target?.value_numeric)}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'احتفاظ' : 'Retention'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.retention_rate_min?.value_numeric)}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'الجودة' : 'Quality'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.loading_zero_issue_rate?.value_numeric)}</div></div>
+              <div className='border rounded p-2'><div className='text-xs text-slate-500'>{lang === 'ar' ? 'وقت التشغيل' : 'Uptime'}</div><div className='text-lg font-semibold text-mrkoon'>{fmtPct(A.platform_uptime_min?.value_numeric)}</div></div>
+            </div>
+          )}
+          <div className='text-xs text-slate-400 mt-3'>
+            {lang === 'ar' ? 'يحرر عبر' : 'Edit via'} <Link to='/admin/assumptions' className='text-mrkoon hover:underline'>Admin → Assumptions</Link>
+          </div>
+        </Card>
+      </details>
+    </div>
+  );
+}
