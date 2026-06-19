@@ -27,6 +27,8 @@ import CycleListPage from './pages/appraisal/CycleListPage.jsx';
 import AppraisalDetailPage from './pages/appraisal/AppraisalDetailPage.jsx';
 import CalibrationPage from './pages/appraisal/CalibrationPage.jsx';
 import BonusViewPage from './pages/bonus/BonusViewPage.jsx';
+import BonusProjectionPage from './pages/bonus/BonusProjectionPage.jsx';
+import TeamBonusPage from './pages/bonus/TeamBonusPage.jsx';
 import SOPIndexPage from './pages/sop/SOPIndexPage.jsx';
 import AdminConfigPage from './pages/admin/ConfigPage.jsx';
 import LevelsPanel from './pages/admin/LevelsPanel.jsx';
@@ -80,6 +82,8 @@ export default function App() {
         <Route path='/appraisals/calibration' element={<RoleGate roles={['dept_head','hr','admin','c_level']}><CalibrationPage /></RoleGate>} />
         <Route path='/appraisals/:id' element={<AppraisalDetailPage />} />
         <Route path='/bonus' element={<BonusViewPage />} />
+        <Route path='/bonus/me' element={<BonusProjectionPage />} />
+        <Route path='/team/bonus' element={<RoleGate roles={['manager','dept_head','hr','admin','c_level']}><TeamBonusPage /></RoleGate>} />
         <Route path='/sops' element={<SOPIndexPage />} />
         <Route path='/admin/config' element={<RoleGate roles={['admin']}><AdminConfigPage /></RoleGate>} />
         <Route path='/admin/levels' element={<RoleGate roles={['admin','hr']}><LevelsPanel /></RoleGate>} />

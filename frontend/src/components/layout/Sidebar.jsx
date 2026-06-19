@@ -25,7 +25,7 @@ const groups = [
       { to: '/kpis/entry', en: 'Enter KPIs',  ar: 'إدخال المؤشرات', icon: '✎', roles: ALL },
       { to: '/okrs',       en: 'My OKRs',     ar: 'أهدافي',         icon: '◎', roles: ALL },
       { to: '/appraisals', en: 'My Appraisal',ar: 'تقييمي',         icon: '★', roles: ALL },
-      { to: '/bonus',      en: 'My Bonus',    ar: 'مكافآتي',        icon: '₤', roles: ALL },
+      { to: '/bonus/me',   en: 'My Bonus',    ar: 'مكافآتي',        icon: '₤', roles: ALL },
     ],
   },
   {
@@ -34,7 +34,7 @@ const groups = [
     items: [
       { to: '/team',        en: 'Team Status', ar: 'حالة الفريق',    icon: '◉', roles: MGR_UP },
       { to: '/cadence',     en: 'Check-ins',   ar: 'المتابعات',      icon: '⟳', roles: MGR_UP },
-      { to: '/team?view=bonus', en: 'Team Bonus', ar: 'مكافآت الفريق', icon: '₤', roles: MGR_UP },
+      { to: '/team/bonus', en: 'Team Bonus', ar: 'مكافآت الفريق', icon: '₤', roles: MGR_UP },
       { to: '/pips',        en: 'PIPs',        ar: 'خطط التحسين',    icon: '!', roles: MGR_UP },
     ],
   },

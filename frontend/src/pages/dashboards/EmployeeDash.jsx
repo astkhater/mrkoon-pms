@@ -160,7 +160,7 @@ export default function EmployeeDash() {
             <div className='text-sm font-medium text-mrkoon'>
               {lang === 'ar' ? 'مكافآتي' : 'My Bonus'}
             </div>
-            <Link to='/bonus' className='text-xs text-mrkoon-accent hover:underline'>
+            <Link to='/bonus/me' className='text-xs text-mrkoon-accent hover:underline'>
               {lang === 'ar' ? 'التفاصيل ←' : 'Details →'}
             </Link>
           </div>

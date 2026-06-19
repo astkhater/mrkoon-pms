@@ -150,7 +150,7 @@ export default function ManagerDash() {
             <div className='text-sm font-medium text-mrkoon'>
               {lang === 'ar' ? 'مكافآت الفريق' : 'Team bonus'}
             </div>
-            <Link to='/team?view=bonus' className='text-xs text-mrkoon-accent hover:underline'>
+            <Link to='/team/bonus' className='text-xs text-mrkoon-accent hover:underline'>
               {lang === 'ar' ? 'التفاصيل ←' : 'Details →'}
             </Link>
           </div>
