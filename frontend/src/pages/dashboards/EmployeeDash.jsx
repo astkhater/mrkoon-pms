@@ -177,8 +177,11 @@ export default function EmployeeDash() {
                 <div className='text-2xl font-semibold text-slate-300'>—</div>
                 <div className='text-xs text-slate-500 mt-1'>
                   {lang === 'ar'
-                    ? 'لا توجد دفعات معتمدة بعد. العرض الحي للمكافأة المتوقعة قادم.'
-                    : 'No approved payouts yet. Live projection view coming.'}
+                    ? 'لا توجد دفعات معتمدة بعد — '
+                    : 'No approved payouts yet — '}
+                  <Link to='/bonus/me' className='text-mrkoon-accent hover:underline'>
+                    {lang === 'ar' ? 'عرض التوقع الحي ←' : 'view live projection →'}
+                  </Link>
                 </div>
               </>
             )

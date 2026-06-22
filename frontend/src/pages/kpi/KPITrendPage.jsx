@@ -57,6 +57,21 @@ function useTrend(kpiId, employeeId) {
   });
 }
 
+function useRelatedSOPs(kpiId) {
+  return useQuery({
+    enabled: !!kpiId,
+    queryKey: ['kpi.sops', kpiId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .schema('def').from('kpi_sop_links')
+        .select('sop_id, sop:sops(id, title_en, title_ar, cycle, category)')
+        .eq('kpi_id', kpiId);
+      if (error) return [];
+      return (data ?? []).filter(r => r.sop != null);
+    },
+  });
+}
+
 function useEmployeesForKPI(kpiId) {
   return useQuery({
     enabled: !!kpiId,
@@ -86,6 +101,7 @@ export default function KPITrendPage() {
   const target = useEffectiveTarget(kpiId);
   const trend = useTrend(kpiId, employeeId || null);
   const emps = useEmployeesForKPI(kpiId);
+  const sops = useRelatedSOPs(kpiId);
 
   const effectiveTarget = target.data?.effective_target ?? kpi.data?.target_value;
   const formulaRef = target.data?.formula_ref;
@@ -191,6 +207,26 @@ export default function KPITrendPage() {
         )}
       </Card>
 
+      <Card title={lang === 'ar' ? 'الإجراءات ذات الصلة' : 'Related SOPs'}>
+        {sops.isLoading ? <Skeleton count={2} className='h-6' /> : (
+          (sops.data ?? []).length === 0 ? (
+            <div className='text-sm text-slate-500'>
+              {lang === 'ar' ? 'لا يوجد إجراء عمل مرتبط بهذا المؤشر.' : 'No SOPs linked to this KPI.'}
+            </div>
+          ) : (
+            <div className='space-y-1'>
+              {(sops.data ?? []).map(r => (
+                <Link key={r.sop.id} to={`/sops?focus=${r.sop.id}`} className='block border rounded p-2 hover:bg-slate-50 text-sm'>
+                  <span className='font-mono text-xs text-slate-500 me-2'>{r.sop.id}</span>
+                  {lang === 'ar' ? (r.sop.title_ar || r.sop.title_en) : r.sop.title_en}
+                  {r.sop.cycle && <span className='ms-2 text-xs text-slate-400'>· {r.sop.cycle}</span>}
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+      </Card>
+
       <Card title={lang === 'ar' ? 'القيم' : 'Values'}>
         {(trend.data ?? []).length === 0 ? (
           <div className='text-sm text-slate-500'>{t('common.no_data')}</div>
@@ -207,14 +243,4 @@ export default function KPITrendPage() {
                     <td className='py-1.5'>{r.period?.label} <span className='text-xs text-slate-400'>· {r.period?.type}</span></td>
                     <td className='text-end font-medium'>{r.actual_value}</td>
                     <td className='text-end text-xs text-slate-500'>{ratio != null ? `${(ratio * 100).toFixed(0)}%` : '—'}</td>
-                    <td className='text-xs text-slate-500 max-w-[300px] truncate'>{r.override_comment ?? ''}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </Card>
-    </div>
-  );
-}
+                    <td className='text-xs text-s

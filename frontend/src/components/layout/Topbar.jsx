@@ -27,19 +27,10 @@ function ViewAsSwitcher({ lang }) {
   }, []);
 
   if (!isRealAdmin) return null;
-
   const current = VIEW_AS_ROLES.find(r => r.code === viewAs);
 
-  function pick(code) {
-    setViewAs(code);
-    setOpen(false);
-    navigate('/');
-  }
-  function exit() {
-    clearViewAs();
-    setOpen(false);
-    navigate('/');
-  }
+  function pick(code) { setViewAs(code); setOpen(false); navigate('/'); }
+  function exit()     { clearViewAs(); setOpen(false); navigate('/'); }
 
   return (
     <div ref={ref} className='relative'>
@@ -55,11 +46,11 @@ function ViewAsSwitcher({ lang }) {
       >
         <span>👁</span>
         {current ? (
-          <span className='font-medium'>
+          <span className='font-medium hidden sm:inline'>
             {lang === 'ar' ? 'يُعرض كـ ' + current.ar : 'Viewing as ' + current.en}
           </span>
         ) : (
-          <span>{lang === 'ar' ? 'عرض كـ…' : 'View as…'}</span>
+          <span className='hidden sm:inline'>{lang === 'ar' ? 'عرض كـ…' : 'View as…'}</span>
         )}
         <span className='text-[10px]'>▾</span>
       </button>
@@ -82,17 +73,12 @@ function ViewAsSwitcher({ lang }) {
             </button>
           ))}
           {current && (
-            <button
-              onClick={exit}
-              className='block w-full text-start px-3 py-2 border-t text-rose-600 hover:bg-rose-50'
-            >
+            <button onClick={exit} className='block w-full text-start px-3 py-2 border-t text-rose-600 hover:bg-rose-50'>
               ✕ {lang === 'ar' ? 'إنهاء وضع المعاينة' : 'Exit preview mode'}
             </button>
           )}
           <div className='px-3 py-2 text-[10px] text-slate-400 border-t'>
-            {lang === 'ar'
-              ? 'لا يُغيّر صلاحيات قاعدة البيانات — للواجهة فقط.'
-              : 'UI only — your data access is unchanged.'}
+            {lang === 'ar' ? 'لا يُغيّر صلاحيات قاعدة البيانات — للواجهة فقط.' : 'UI only — your data access is unchanged.'}
           </div>
         </div>
       )}
@@ -100,7 +86,7 @@ function ViewAsSwitcher({ lang }) {
   );
 }
 
-export default function Topbar() {
+export default function Topbar({ onToggleDrawer = () => {} }) {
   const { profile, signOut, role, permissions = [], viewAs } = useAuth();
   const { lang, toggleLang, t } = useLang();
   const name = lang === 'ar' ? (profile?.full_name_ar || profile?.full_name_en) : profile?.full_name_en;
@@ -108,11 +94,23 @@ export default function Topbar() {
 
   return (
     <header className={
-      'bg-white border-b px-4 md:px-8 py-3 flex items-center justify-between ' +
+      'bg-white border-b px-3 md:px-8 py-2.5 md:py-3 flex items-center justify-between gap-2 ' +
       (viewAs ? 'border-b-2 border-amber-300' : '')
     }>
-      <div className='flex items-center gap-3 text-sm text-slate-500'>
-        <span className='hidden sm:inline'>{t('app.subtitle', 'Performance Management')}</span>
+      <div className='flex items-center gap-2 md:gap-3 text-sm text-slate-500 min-w-0'>
+        {/* Hamburger — mobile only */}
+        <button
+          onClick={onToggleDrawer}
+          className='md:hidden p-1.5 -m-1.5 rounded hover:bg-slate-100 text-mrkoon'
+          aria-label={lang === 'ar' ? 'فتح القائمة' : 'Open menu'}
+        >
+          <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+            <line x1='3' y1='6' x2='21' y2='6' />
+            <line x1='3' y1='12' x2='21' y2='12' />
+            <line x1='3' y1='18' x2='21' y2='18' />
+          </svg>
+        </button>
+        <span className='hidden lg:inline truncate'>{t('app.subtitle', 'Performance Management')}</span>
         <button
           onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: !navigator.platform.toLowerCase().includes('mac'), metaKey: navigator.platform.toLowerCase().includes('mac') }))}
           className='hidden md:flex items-center gap-1 text-xs px-2 py-1 border rounded hover:bg-slate-50'
@@ -123,25 +121,25 @@ export default function Topbar() {
           <kbd className='font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded'>{navigator.platform.toLowerCase().includes('mac') ? '⌘K' : 'Ctrl+K'}</kbd>
         </button>
       </div>
-      <div className='flex items-center gap-2 md:gap-3'>
+      <div className='flex items-center gap-1.5 md:gap-3'>
         <ViewAsSwitcher lang={lang} />
         <button
           onClick={toggleLang}
-          className='px-3 py-1 rounded border text-sm hover:bg-slate-50'
+          className='px-2 md:px-3 py-1 rounded border text-sm hover:bg-slate-50'
           aria-label='Toggle language'
         >
           {lang === 'ar' ? 'EN' : 'AR'}
         </button>
-        <Link to='/help' className='text-sm text-slate-500 hover:text-mrkoon' title={lang === 'ar' ? 'مساعدة' : 'Help'}>?</Link>
+        <Link to='/help' className='text-sm text-slate-500 hover:text-mrkoon px-1 hidden sm:inline' title={lang === 'ar' ? 'مساعدة' : 'Help'}>?</Link>
         <NotificationBell />
-        <div className='flex items-center gap-2 border-s ps-3'>
+        <div className='flex items-center gap-2 border-s ps-2 md:ps-3'>
           <div className='w-8 h-8 rounded-full bg-mrkoon-accent text-white grid place-items-center text-xs font-semibold'>{initials}</div>
-          <div className='hidden md:block'>
-            <div className='text-sm font-medium leading-tight'>{name}</div>
+          <div className='hidden lg:block'>
+            <div className='text-sm font-medium leading-tight truncate max-w-[140px]'>{name}</div>
             <div className='text-[10px] text-slate-500 leading-tight'>{role}{permissions.length > 0 && ` · ${permissions.join('·')}`}</div>
           </div>
         </div>
-        <button onClick={signOut} className='text-sm text-rose-600 hover:underline ms-1'>
+        <button onClick={signOut} className='text-xs md:text-sm text-rose-600 hover:underline ms-1'>
           {t('auth.signout', 'Sign out')}
         </button>
       </div>
